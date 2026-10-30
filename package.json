@@ -1,8 +1,8 @@
 {
-  "name": "manglet-server",
+  "name": "manglet-rehost",
   "version": "1.0.0",
   "private": true,
-  "description": "Minimal auth + global chat backend for Manglet",
+  "description": "Full backend + frontend for Manglet Rehost",
   "main": "server.js",
   "scripts": {
     "start": "node server.js"
