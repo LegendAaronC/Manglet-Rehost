@@ -32,7 +32,7 @@ function rateLimit(windowMs, maxRequests, message) {
     const now = Date.now();
     const timestamps = (hits.get(ip) || []).filter(t => now - t < windowMs);
     if (timestamps.length >= maxRequests) {
-      return res.status(429).json({ message: message || 'Too many requests — please slow down and try again shortly.' });
+      return res.status(429).json({ message: message || 'Too many requests, please slow down and try again shortly.' });
     }
     timestamps.push(now);
     hits.set(ip, timestamps);
