@@ -11,6 +11,7 @@
     "bcryptjs": "^2.4.3",
     "dotenv": "^18.0.5",
     "express": "^4.19.2",
+    "pg-pool": "^3.14.0",
     "socket.io": "^4.7.5",
     "sqlite": "^5.1.1"
   },

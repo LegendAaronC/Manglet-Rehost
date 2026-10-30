@@ -129,12 +129,24 @@ function saveDB() {
   }
 }
 
-const loadedDB = loadDB();
-let db = loadedDB.data;
-if (loadedDB.importedJson) {
-  store.importJsonIfPresent(db, LEGACY_JSON_PATH);
-  console.log('imported ' + Object.keys(db.users).length + ' accounts from db.json into ${store.path}');
-}
+let db;
+
+(async () => {
+  if (store.init) await store.init();
+  const loadedDB = loadDB();
+  db = loadedDB.data;
+  if (loadedDB.importedJson) {
+    store.importJsonIfPresent(db, LEGACY_JSON_PATH);
+    console.log('imported ' + Object.keys(db.users).length + ' accounts from db.json into ' + store.path);
+  }
+
+  wipeDataOnce(process.env.WIPE_DATA);
+
+  Object.keys(db.sessions).forEach(t => {
+    const s = db.sessions[t];
+    if (!s || typeof s !== 'object' || Date.now() - s.createdAt > SESSION_TTL_MS) delete db.sessions[t];
+  });
+  const sessions = new Map(Object.entries(db.sessions));
 
 function own(obj, key) {
   return (obj && typeof key === 'string' && Object.prototype.hasOwnProperty.call(obj, key)) ? obj[key] : undefined;
@@ -572,7 +584,6 @@ Object.keys(db.sessions).forEach(t => {
   const s = db.sessions[t];
   if (!s || typeof s !== 'object' || Date.now() - s.createdAt > SESSION_TTL_MS) delete db.sessions[t];
 });
-const sessions = new Map(Object.entries(db.sessions));
 
 function setSession(token, key) {
   const entry = { user: key, createdAt: Date.now() };
@@ -2807,7 +2818,8 @@ process.on('SIGTERM', shutdown);
 process.on('SIGINT', shutdown);
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  serverStarted = true;
-  console.log(`running on http://localhost:${PORT}`);
-});
+  server.listen(PORT, () => {
+    serverStarted = true;
+    console.log(`running on http://localhost:${PORT}`);
+  });
+})();
