@@ -1,5 +1,5 @@
 # Manglet Rehost
-This Manglet is Rehosted by Aaron.
+###### Manglet Rehost is made by Aaron by using old Manglet source code and remaking the sites and some parts of the backend.
 
 ### Want to self host?
 ###### To self host you need to configure your environment variables (example exists). Then to run it you do npm install and node server.js
@@ -15,3 +15,6 @@ This Manglet is Rehosted by Aaron.
 
 ### What is the name for the database URL in the environments?
 ###### DATABASE_URL
+
+### Where can I play this?
+###### https://mangletrehost.aaronsstuff.com
