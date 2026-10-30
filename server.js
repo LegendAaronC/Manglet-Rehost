@@ -130,7 +130,7 @@ function saveDB() {
 }
 
 let db;
-
+const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 (async () => {
   if (store.init) await store.init();
   const loadedDB = loadDB();
@@ -579,7 +579,6 @@ function wipeDataOnce(marker) {
 }
 wipeDataOnce(process.env.WIPE_DATA);
 
-const SESSION_TTL_MS = 30 * 24 * 60 * 60 * 1000;
 Object.keys(db.sessions).forEach(t => {
   const s = db.sessions[t];
   if (!s || typeof s !== 'object' || Date.now() - s.createdAt > SESSION_TTL_MS) delete db.sessions[t];
