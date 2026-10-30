@@ -57,8 +57,6 @@ function defaultDB() {
       individualScores: {}
     },
     reports: [
-      { id: 1, author: "ascend", message: "buy it", reportedBy: "hthelegend" },
-      { id: 2, author: "hthelegend", message: "Hi", reportedBy: "cosmicdragonyt" }
     ],
     news: [],
     trades: [],
