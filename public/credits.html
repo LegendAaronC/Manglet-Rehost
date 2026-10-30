@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<title>Manglet Rehost | Credits</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'DynaPuff', Arial, sans-serif; }
+:root { --bg-color: #ffe600; --sidebar-color: #ffee00; --sidebar-hover: #ffd000; --token-accent: #ffc400; }
+body { background-color: var(--bg-color); min-height: 100vh; display: flex; }
+
+
+.sidebar { width: 250px; background: var(--sidebar-color); min-height: 100vh; display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; left: 0; z-index: 10; }
+.sidebar-logo { font-size: 28px; font-weight: 900; color: white; padding: 0 20px 24px 20px; letter-spacing: 2px; }
+.sidebar-nav { display: flex; flex-direction: column; flex: 1; }
+.sidebar-nav a { color: #ffffff; text-decoration: none; padding: 12px 20px; font-size: 16px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
+.sidebar-nav a:hover, .sidebar-nav a.active { background: var(--sidebar-hover); color: white; }
+
+
+.topbar { position: fixed; top: 0; left: 250px; right: 0; padding: 20px 24px; display: flex; justify-content: flex-end; align-items: center; gap: 12px; z-index: 10; }
+.token-display { display: flex; align-items: center; gap: 6px; background: var(--token-accent); color: white; padding: 6px 14px; border-radius: 8px; font-size: 16px; }
+.token-display img { width: 22px; height: 22px; border-radius: 4px; }
+.ruby-display { display: flex; align-items: center; gap: 6px; background: #e0115f; color: white; padding: 6px 14px; border-radius: 8px; font-size: 16px; }
+.ruby-display img { width: 22px; height: 22px; border-radius: 4px; }
+
+.main-content { margin-left: 250px; flex: 1; display: flex; justify-content: center; padding: 90px 20px 60px 20px; }
+
+
+.credits-wrap { width: 100%; max-width: 980px; font-family: Arial, sans-serif; color: #e8e8f0; }
+
+.credits-header { text-align: center; margin-bottom: 40px; }
+.credits-logo {
+  width: 56px; height: 56px; border-radius: 14px; background: linear-gradient(145deg, #ff9f43, #ff5e00);
+  display: flex; align-items: center; justify-content: center; margin: 0 auto 16px auto;
+  font-family: 'DynaPuff', Arial, sans-serif; font-size: 26px; color: #fff;
+  box-shadow: 0 8px 20px rgba(255, 94, 0, 0.35);
+}
+.credits-title { font-family: 'DynaPuff', Arial, sans-serif; font-size: 32px; color: #fff; margin-bottom: 6px; }
+.credits-subtitle { color: #7d829c; font-size: 14px; }
+
+.section-header { display: flex; align-items: center; gap: 10px; margin: 34px 0 18px 0; }
+.section-header .icon { font-size: 16px; }
+.section-header .label { font-family: 'DynaPuff', Arial, sans-serif; font-size: 15px; letter-spacing: 0.5px; color: #fff; }
+.section-header .count { color: #7d829c; font-weight: normal; font-family: Arial, sans-serif; font-size: 13px; }
+.section-header .rule { flex: 1; height: 1px; background: rgba(255,255,255,0.1); }
+.section-header.owners .label, .section-header.owners .icon { color: #ffcf4d; }
+.section-header.admins .label, .section-header.admins .icon { color: #4d8dff; }
+
+.people-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; }
+
+.person-card {
+  background: #14121f; border: 1px solid #262238; border-radius: 16px; padding: 22px;
+  display: flex; gap: 16px; align-items: flex-start;
+}
+.person-card.owner-card { border-color: rgba(255, 207, 77, 0.35); }
+
+.person-avatar {
+  width: 60px; height: 60px; border-radius: 14px; flex-shrink: 0; position: relative; overflow: hidden;
+  background: #23233d; display: flex; align-items: center; justify-content: center;
+  border: 2.5px solid #3b82f6; font-family: 'DynaPuff', Arial, sans-serif; font-size: 22px; color: #fff;
+}
+.person-avatar img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.person-avatar.owner-avatar { border-color: #ffcf4d; box-shadow: 0 0 14px rgba(255,207,77,0.25); }
+
+.person-name-row { display: flex; align-items: center; gap: 7px; margin-bottom: 6px; }
+.person-name-row .role-icon { font-size: 13px; }
+.person-name { font-family: 'DynaPuff', Arial, sans-serif; font-size: 15.5px; color: #fff; }
+
+.role-pill { display: inline-block; font-size: 10.5px; font-weight: 800; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; letter-spacing: 0.5px; }
+.role-pill.owner-pill { background: rgba(255,207,77,0.15); color: #ffcf4d; }
+.role-pill.admin-pill { background: rgba(59,111,237,0.15); color: #7fa8ff; }
+
+.person-desc { color: #7d829c; font-size: 13px; margin-bottom: 10px; }
+
+.badge-row { display: flex; gap: 6px; }
+.badge-pill {
+  width: 24px; height: 24px; border-radius: 50%; background: rgba(255,255,255,0.06);
+  display: flex; align-items: center; justify-content: center; font-size: 12px;
+}
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DynaPuff:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style id="manglet-rehost-theme">
+:root {
+  --manglet-panel: #17191f;
+  --manglet-panel-2: #20232b;
+  --manglet-border: rgba(255,255,255,.09);
+  --manglet-text: #f4f5f7;
+  --manglet-muted: #9ba2b2;
+  --manglet-shadow: 0 14px 40px rgba(0,0,0,.22);
+  --manglet-radius: 18px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; scroll-behavior: smooth; }
+body {
+  background: var(--bg-color, #17100c) !important;
+  color: var(--manglet-text) !important;
+  font-family: 'Space Grotesk', Arial, sans-serif !important;
+  line-height: 1.5;
+}
+.sidebar {
+  width: 250px !important; background: var(--sidebar-color, #24160f) !important;
+  border-right: 1px solid rgba(255,255,255,.07);
+  padding: 22px 12px !important; box-shadow: 8px 0 30px rgba(0,0,0,.12);
+  overflow-y: auto; overflow-x: hidden;
+}
+.sidebar-logo {
+  font-family: 'DynaPuff','Space Grotesk',sans-serif !important;
+  font-size: 25px !important; letter-spacing: .5px !important;
+  color: #fff !important; padding: 0 12px 26px !important;
+}
+.sidebar-nav { gap: 5px; }
+.sidebar-nav a {
+  color: #c6cad4 !important; font: 600 13.5px 'Space Grotesk',sans-serif !important;
+  padding: 11px 13px !important; border-radius: 12px; margin: 0 2px;
+  gap: 11px !important; min-height: 42px; transition: background .18s, color .18s, transform .18s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: var(--sidebar-hover, #382216) !important; color: #fff !important;
+}
+.sidebar-nav a.active { box-shadow: inset 3px 0 0 var(--token-accent, #ff8c32); }
+.topbar { left: 250px !important; padding: 18px 24px !important; gap: 10px !important; }
+.token-display, .ruby-display {
+  border: 1px solid rgba(255,255,255,.12); border-radius: 13px !important;
+  padding: 8px 13px !important; box-shadow: 0 5px 16px rgba(0,0,0,.16);
+  font: 700 13px 'Space Grotesk',sans-serif !important;
+}
+.token-display { background: var(--token-accent, #ff8c32) !important; color: #fff !important; }
+.ruby-display { background: #a92d5b !important; color: #fff !important; }
+.main-content { margin-left: 250px !important; padding: 104px 28px 44px !important; min-width: 0; }
+.page-title, .owner-title, .profile-name, .section-title, .chat-panel-title, .picker-box h3, .title {
+  font-family: 'DynaPuff','Space Grotesk',sans-serif !important;
+  color: var(--manglet-text) !important; letter-spacing: -.3px;
+}
+.page-title { font-size: clamp(25px,3vw,34px) !important; }
+.page-subtitle, .owner-subtitle { color: var(--manglet-muted) !important; }
+.trade-wrap, .shop-wrap, .profile-wrap, .owner-wrap, .credits-wrap { max-width: 1240px; }
+.panel-card, .room-panel, .trade-list-card, .stat-card, .stat-tile, .shop-item-card,
+.shop-info-card, .collection-card, .clan-card, .profile-card, .card, .admin-row,
+.bazaar-card, .battle-card, .news-card, .leaderboard-card, .chat-panel,
+[class*="panel"], [class*="card"] {
+  border-color: var(--manglet-border);
+}
+.room-panel, .trade-list-card, .panel-card, .stat-card, .stat-tile, .shop-item-card,
+.shop-info-card, .collection-card, .clan-card, .profile-card, .card, .admin-row,
+.bazaar-card, .battle-card, .news-card, .leaderboard-card {
+  background: var(--manglet-panel) !important;
+  border-radius: var(--manglet-radius) !important;
+  box-shadow: var(--manglet-shadow);
+}
+input, textarea, select, .new-trade-row input, .chat-input-row input, .offer-tokens-row {
+  font-family: 'Space Grotesk',sans-serif !important;
+  border-radius: 12px !important;
+}
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+  background-color: var(--manglet-panel-2) !important;
+  color: var(--manglet-text) !important; border-color: var(--manglet-border) !important;
+}
+button, .button, .btn, .shop-buy-btn, .add-blook-btn, .list-tab-btn, .friends-tab-btn,
+.profile-action-btn, .wide-btn {
+  font-family: 'Space Grotesk',sans-serif !important; font-weight: 700 !important;
+  border-radius: 12px !important; transition: transform .16s, filter .16s, background .16s;
+}
+button:hover:not(:disabled), .button:hover, .btn:hover { filter: brightness(1.08); }
+button:active:not(:disabled) { transform: translateY(1px); }
+.list-tab-btn, .friends-tab-btn {
+  background: var(--manglet-panel) !important; border: 1px solid var(--manglet-border) !important;
+  color: var(--manglet-muted) !important;
+}
+.list-tab-btn.active, .friends-tab-btn.active {
+  background: var(--token-accent) !important; border-color: var(--token-accent) !important; color: #fff !important;
+}
+.room-back-btn { color: var(--manglet-muted) !important; }
+.room-footer { border-radius: 14px !important; }
+.offer-blook-icon, .picker-tile-icon, .room-avatar, .trade-list-avatar { border-radius: 13px !important; }
+.picker-box { background: var(--manglet-panel) !important; border: 1px solid var(--manglet-border) !important; border-radius: 20px !important; }
+.page-header-row { gap: 14px; }
+a { transition: color .16s, background .16s; }
+@media (max-width: 900px) {
+  .sidebar { width: 76px !important; padding: 18px 7px !important; }
+  .sidebar-logo { font-size: 0 !important; padding: 0 0 24px !important; text-align: center; }
+  .sidebar-logo::after { content: 'M'; font: 700 27px 'DynaPuff',sans-serif; color: var(--token-accent,#ff8c32); }
+  .sidebar-nav a { justify-content: center; padding: 12px 5px !important; gap: 0 !important; font-size: 0 !important; min-height: 44px; }
+  .sidebar-nav a .manglet-nav-icon { font-size: 21px !important; }
+  .topbar { left: 76px !important; padding: 13px 14px !important; }
+  .main-content { margin-left: 76px !important; padding: 86px 16px 32px !important; }
+}
+@media (max-width: 560px) {
+  .main-content { padding: 84px 12px 24px !important; }
+  .topbar { gap: 6px !important; }
+  .token-display, .ruby-display { padding: 6px 8px !important; font-size: 11px !important; }
+  .token-display img, .ruby-display img { width: 18px !important; height: 18px !important; }
+  .room-panel, .panel-card { padding: 15px !important; }
+  .room-footer button { padding: 14px 8px !important; font-size: 12px !important; }
+}
+</style>
+
+
+<style id="manglet-unified-navigation">
+:root{--bg-color:#17100c;--sidebar-color:#24160f;--sidebar-hover:#382216;--token-accent:#ff8c32;--panel:#1d2027;--panel2:#252933;--border:rgba(255,255,255,.09);--text:#f5f6fa;--muted:#a1a7b5}
+*{box-sizing:border-box}
+html{min-height:100%;scroll-behavior:smooth}
+body{margin:0!important;min-height:100vh;background:var(--bg-color)!important;color:var(--text,#f5f6fa)!important;font-family:'Space Grotesk',sans-serif!important}
+.sidebar{position:fixed!important;inset:0 auto 0 0!important;width:250px!important;background:var(--sidebar-color)!important;padding:22px 12px!important;border-right:1px solid var(--border)!important;box-shadow:8px 0 30px #0002;overflow-y:auto;overflow-x:hidden;z-index:20}
+.sidebar-logo{font:700 25px 'DynaPuff',sans-serif!important;color:var(--text,#f5f6fa)!important;padding:0 12px 26px!important;letter-spacing:0!important}
+.sidebar-nav{display:flex!important;flex-direction:column!important;gap:5px!important;flex:1}
+.sidebar-nav a{display:flex!important;align-items:center!important;gap:10px!important;text-decoration:none!important;color:#c6cad4!important;padding:11px 13px!important;border-radius:12px!important;font:600 13.5px 'Space Grotesk',sans-serif!important;transition:background .18s,color .18s,transform .18s}
+.sidebar-nav a:hover,.sidebar-nav a.active{background:var(--sidebar-hover)!important;color:#fff!important}
+.sidebar-nav a.active{box-shadow:inset 3px 0 var(--token-accent)!important}
+.sidebar-nav .material-icons{font-size:20px!important;line-height:1;flex:0 0 20px}
+.topbar{position:fixed!important;top:0!important;left:250px!important;right:0!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;padding:18px 24px!important;z-index:15!important;pointer-events:none}
+.token-display,.ruby-display{padding:8px 13px!important;border-radius:12px!important;background:var(--token-accent)!important;color:#fff!important;font-weight:700!important;margin-left:8px!important;box-shadow:0 6px 18px #0002}
+.ruby-display{background:#a92d5b!important}
+.token-display img,.ruby-display img{max-height:19px;max-width:19px;object-fit:contain;vertical-align:middle}
+.main-content{margin-left:250px!important;padding:100px 28px 44px!important;min-width:0}
+.page-title,.title,h1{font-family:'DynaPuff',sans-serif!important;color:var(--text,#f5f6fa)}
+.page-title,.title{font-size:clamp(27px,4vw,36px)!important;line-height:1.2;margin:8px 0 12px!important}
+.page-subtitle,.subtitle,.owner-subtitle{color:var(--muted,#a1a7b5)!important}
+.panel,.panel-card,.room-panel,.trade-list-card,.stat-card,.stat-tile,.shop-item-card,.shop-info-card,.credits-card,.settings-card,.content-card,.card{border-radius:18px!important;border:1px solid var(--border)!important;box-shadow:0 14px 40px #0003}
+button,.btn,input[type=button],input[type=submit]{border-radius:12px!important;font-family:'Space Grotesk',sans-serif!important}
+input,select,textarea{font-family:'Space Grotesk',sans-serif!important;border-radius:10px}
+a{transition:color .18s,background .18s}
+@media(max-width:900px){.sidebar{width:76px!important;padding:18px 7px!important}.sidebar-logo{font-size:0!important;text-align:center;padding:0 0 24px!important}.sidebar-logo:after{content:'M';font:700 27px 'DynaPuff',sans-serif;color:var(--token-accent)}.sidebar-nav a{justify-content:center!important;gap:0!important;font-size:0!important;padding:12px 5px!important}.sidebar-nav .material-icons{font-size:21px!important;flex:0 0 auto}.topbar{left:76px!important;padding:13px!important}.main-content{margin-left:76px!important;padding:86px 16px 32px!important}}
+@media(max-width:560px){.main-content{padding:84px 12px 24px!important}.panel,.panel-card,.room-panel,.trade-list-card,.stat-card,.stat-tile,.shop-item-card,.shop-info-card{padding:17px!important}.topbar{padding:10px!important}.token-display,.ruby-display{padding:7px 9px!important;font-size:12px}}
+</style>
+
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-logo">Manglet Rehost</div>
+<nav class="sidebar-nav">
+<a href="dashboard"><span class="material-icons">storefront</span>Market</a>
+<a href="chat"><span class="material-icons">forum</span>Global Chat</a>
+<a href="collection"><span class="material-icons">inventory_2</span>Collection</a>
+<a href="clans"><span class="material-icons">groups</span>Clans</a>
+<a href="news"><span class="material-icons">newspaper</span>News</a>
+<a href="trade"><span class="material-icons">swap_horiz</span>Trade</a>
+<a href="bazaar"><span class="material-icons">store</span>Bazaar</a>
+<a href="battle"><span class="material-icons">sports_esports</span>Battle Royale</a>
+<a href="leaderboard"><span class="material-icons">leaderboard</span>Leaderboard</a>
+<a href="rubyshop"><span class="material-icons">diamond</span>Ruby Shop</a>
+<a href="credits" class="active"><span class="material-icons">favorite</span>Credits</a>
+<a href="settings"><span class="material-icons">settings</span>Settings</a>
+<a href="profile"><span class="material-icons">person</span>Profile</a>
+</nav>
+</div>
+
+<div class="topbar">
+<div class="token-display">
+<img src="coin.png" alt="coin" onerror="this.style.display='none'">
+<span id="tokenBalance">0</span>
+</div>
+<div class="ruby-display">
+<img src="ruby.png" alt="ruby" onerror="this.style.display='none'">
+<span id="rubyBalance">0</span>
+</div>
+</div>
+
+<div class="main-content">
+<div class="credits-wrap">
+
+  <div class="credits-header">
+    <div class="credits-logo">M</div>
+    <div class="credits-title">Credits</div>
+    <div class="credits-subtitle">The team behind Manglet Rehost</div>
+  </div>
+
+  <div class="section-header owners">
+    <span class="label">OWNERS <span class="count" id="ownerCount"></span></span>
+    <span class="rule"></span>
+  </div>
+  <div class="people-grid" id="ownersGrid"></div>
+
+</div>
+</div>
+
+<script>
+
+
+
+
+
+
+
+
+const OWNERS = [
+  { name: "Aaron", avatar: "avatars/aaron.png", description: "Remade everything and hosts Manglet Rehost." },
+];
+
+function personCardHtml(person) {
+  const initial = person.name.charAt(0).toUpperCase();
+  const borderStyle = person.borderColor ? `style="border-color:${person.borderColor};"` : '';
+
+  return `
+    <div class="person-card">
+      <div class="person-avatar">
+        ${initial}
+        <img src="${person.avatar}" alt="${person.name}" onerror="this.remove()">
+      </div>
+      <div>
+        <div class="person-name-row">
+          <span class="person-name">${person.name}</span>
+        </div>
+        <div class="person-desc">${person.description}</div>
+      </div>
+    </div>
+  `;
+}
+
+function render() {
+  document.getElementById('ownerCount').innerText = `(${OWNERS.length})`;
+
+  document.getElementById('ownersGrid').innerHTML = OWNERS
+    .map(p => personCardHtml(p))
+    .join('');
+}
+render();
+
+
+const AUTH_TOKEN = localStorage.getItem('mangletSessionToken');
+if (!AUTH_TOKEN) { location.href = "/login"; }
+const socket = io({ auth: { token: AUTH_TOKEN } });
+socket.on('rubyEarned', (data) => {
+  const el = document.getElementById('rubyBalance');
+  if (el) el.innerText = data.rubies;
+});
+
+async function loadMe() {
+  try {
+    const res = await fetch('/api/me', { headers: { 'Authorization': 'Bearer ' + AUTH_TOKEN } });
+    if (res.status === 401) { localStorage.removeItem('mangletSessionToken'); location.href = "/login"; return; }
+    const data = await res.json();
+    document.getElementById('tokenBalance').innerText = Math.round(data.user.tokens).toLocaleString('en-US');
+    const rubyEl = document.getElementById('rubyBalance');
+    if (rubyEl) rubyEl.innerText = Math.round(data.user.rubies || 0).toLocaleString('en-US');
+    applyMangletTheme(data.user.theme);
+    showOwnerNav(data.user.isOwner);
+    socket.emit('registerUser', data.user.username);
+  } catch (e) {}
+}
+loadMe();
+</script>
+
+
+<script id="manglet-rehost-nav-icons">
+(() => {
+  const iconMap = {
+    'Market':'storefront','Shop':'shopping-bag','Global Chat':'forum','Collection':'inventory_2',
+    'Clans':'groups','News':'newspaper','Trade':'swap_horiz','Bazaar':'store',
+    'Battle Royale':'sports_esports','Leaderboard':'leaderboard','Ruby Shop':'diamond',
+    'Credits':'favorite','Settings':'settings','Profile':'person','Admin Panel':'admin_panel_settings',
+    'Owner Panel':'verified_user'
+  };
+  document.querySelectorAll('.sidebar-nav a').forEach(a => {
+    const label = a.textContent.trim();
+    const icon = iconMap[label];
+    if (icon && !a.querySelector('.manglet-nav-icon')) {
+      const span = document.createElement('span');
+      span.className = 'material-icons manglet-nav-icon';
+      span.setAttribute('aria-hidden','true');
+      span.textContent = icon;
+      span.style.fontSize = '19px';
+      span.style.lineHeight = '1';
+      a.prepend(span);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

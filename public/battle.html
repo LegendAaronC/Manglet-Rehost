@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js"></script>
+<title>Manglet Rehost | Battle</title>
+<link href="https://fonts.googleapis.com/css2?family=DynaPuff&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'DynaPuff', Arial, sans-serif; }
+:root {
+  --bg-color: #ffe600;
+  --sidebar-color: #ffee00;
+  --sidebar-hover: #ffd000;
+  --token-accent: #ffc400;
+}
+body { background-color: var(--bg-color); min-height: 100vh; display: flex; }
+
+.sidebar { width: 250px; background: var(--sidebar-color); min-height: 100vh; display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; left: 0; z-index: 10; }
+.sidebar-logo { font-size: 28px; font-weight: 900; color: white; padding: 0 20px 24px 20px; letter-spacing: 2px; }
+.sidebar-nav { display: flex; flex-direction: column; flex: 1; }
+.sidebar-nav a { color: #ffffff; text-decoration: none; padding: 12px 20px; font-size: 16px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
+.sidebar-nav a:hover, .sidebar-nav a.active { background: var(--sidebar-hover); color: white; }
+
+.topbar { position: fixed; top: 0; left: 250px; right: 0; padding: 20px 24px; display: flex; justify-content: flex-end; align-items: center; gap: 12px; z-index: 10; }
+.token-display { display: flex; align-items: center; gap: 6px; background: var(--token-accent); color: white; padding: 6px 14px; border-radius: 8px; font-size: 16px; }
+.token-display img { width: 22px; height: 22px; border-radius: 4px; }
+.ruby-display { display: flex; align-items: center; gap: 6px; background: #e0115f; color: white; padding: 6px 14px; border-radius: 8px; font-size: 16px; }
+.ruby-display img { width: 22px; height: 22px; border-radius: 4px; }
+
+.main-content { margin-left: 250px; flex: 1; display: flex; justify-content: center; align-items: flex-start; padding: 100px 20px 60px 20px; }
+.battle-wrap { width: 100%; max-width: 900px; font-family: Arial, sans-serif; color: #e8e8f0; }
+
+.battle-header { display: flex; align-items: center; gap: 14px; margin-bottom: 24px; }
+.battle-header-icon {
+  width: 48px; height: 48px; border-radius: 12px; background: rgba(255,68,68,0.15);
+  border: 1px solid rgba(255,68,68,0.4); display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.battle-title { font-family: 'DynaPuff', Arial, sans-serif; font-size: 26px; color: #17162b; }
+.battle-subtitle { color: #6b6320; font-size: 13.5px; margin-top: 2px; }
+
+
+.panel-card { background: #14121f; border: 1px solid #262238; border-radius: 16px; padding: 24px; margin-bottom: 20px; }
+.panel-title { font-family: 'DynaPuff', Arial, sans-serif; font-size: 15px; color: #fff; margin-bottom: 6px; }
+.panel-desc { color: #7d829c; font-size: 12.5px; line-height: 1.5; margin-bottom: 16px; }
+
+.icon-picker-row { display: flex; align-items: center; gap: 16px; margin-bottom: 18px; }
+.picked-icon-preview {
+  width: 64px; height: 64px; border-radius: 14px; background: #23233d; border: 2px solid rgba(255,255,255,0.1);
+  display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0;
+}
+.picked-icon-preview img { width: 80%; height: 80%; object-fit: contain; }
+.picked-icon-preview .placeholder { font-size: 24px; color: #565a75; }
+.choose-icon-btn {
+  background: rgba(59,111,237,0.15); color: #6ea0ff; border: 1px solid rgba(59,111,237,0.35);
+  border-radius: 10px; padding: 10px 16px; font-weight: bold; font-size: 13px; cursor: pointer;
+}
+.choose-icon-btn:hover { background: rgba(59,111,237,0.25); }
+
+.big-action-btn {
+  width: 100%; border: none; border-radius: 12px; padding: 16px; font-family: 'DynaPuff', Arial, sans-serif;
+  font-size: 16px; cursor: pointer; color: #fff; transition: filter 0.15s;
+}
+.big-action-btn:hover { filter: brightness(1.1); }
+.btn-join { background: linear-gradient(135deg, #ff4444, #ff8800); box-shadow: 0 6px 0 #a12b2b; }
+.btn-leave { background: #3a2a2a; color: #ff8f8f; box-shadow: 0 6px 0 #241818; }
+
+.lobby-status-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.lobby-count { font-family: 'DynaPuff', Arial, sans-serif; font-size: 15px; color: #ffcf4d; }
+.countdown-pill {
+  background: rgba(255,207,77,0.15); border: 1px solid rgba(255,207,77,0.4); color: #ffcf4d;
+  padding: 6px 14px; border-radius: 20px; font-weight: bold; font-size: 13px;
+}
+.lobby-players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr)); gap: 10px; }
+.lobby-player-tile { background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 10px; text-align: center; }
+.lobby-player-icon { width: 40px; height: 40px; border-radius: 10px; background: #23233d; margin: 0 auto 6px auto; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.lobby-player-icon img { width: 80%; height: 80%; object-fit: contain; }
+.lobby-player-name { font-size: 10.5px; color: #cfd0e0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.lobby-empty-note { color: #565a75; font-size: 13px; text-align: center; padding: 20px 0; grid-column: 1 / -1; }
+
+
+.arena-wrap { display: none; position: relative; }
+.arena-hud {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;
+  background: #14121f; border: 1px solid #262238; border-radius: 12px; padding: 12px 18px;
+}
+.arena-hud-item { text-align: center; }
+.arena-hud-value { font-family: 'DynaPuff', Arial, sans-serif; font-size: 18px; color: #fff; }
+.arena-hud-label { color: #7d829c; font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; margin-top: 2px; }
+.arena-hud-value.danger { color: #ff6b6b; }
+
+#battleCanvas {
+  width: 100%; aspect-ratio: 1 / 1; border-radius: 16px; display: block;
+  background: radial-gradient(circle at 50% 40%, #1a1730 0%, #0a0814 70%, #050408 100%);
+  box-shadow: 0 0 0 1px rgba(255,255,255,0.06), 0 20px 60px rgba(0,0,0,0.5);
+}
+.you-eliminated-banner {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  background: rgba(10,8,15,0.92); border: 2px solid rgba(255,68,68,0.5); border-radius: 16px;
+  padding: 24px 40px; text-align: center; display: none;
+}
+.you-eliminated-banner h2 { font-family: 'DynaPuff', Arial, sans-serif; color: #ff6b6b; font-size: 22px; margin-bottom: 6px; }
+.you-eliminated-banner p { color: #9096b3; font-size: 13px; }
+
+
+.countdown-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.85); display: flex; flex-direction: column;
+  align-items: center; justify-content: center; z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.3s;
+}
+.countdown-overlay.active { opacity: 1; pointer-events: auto; }
+.countdown-number {
+  font-family: 'DynaPuff', Arial, sans-serif; font-size: 120px; color: #fff;
+  text-shadow: 0 0 40px rgba(255,68,68,0.8); animation: countdownPulse 1s ease-in-out infinite;
+}
+@keyframes countdownPulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.15); } }
+.countdown-label { font-size: 16px; color: #ffcf4d; margin-top: 10px; font-family: Arial, sans-serif; font-weight: bold; }
+
+
+.results-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.88); display: flex; align-items: center; justify-content: center;
+  z-index: 300; opacity: 0; pointer-events: none; transition: opacity 0.3s; overflow: hidden;
+}
+.results-overlay.active { opacity: 1; pointer-events: auto; }
+.results-box {
+  background: #14101f; border: 1px solid rgba(255,207,77,0.3); border-radius: 20px; padding: 32px;
+  width: 92%; max-width: 420px; text-align: center; position: relative; z-index: 2;
+}
+.results-crown { font-size: 42px; margin-bottom: 8px; }
+.results-title { font-family: 'DynaPuff', Arial, sans-serif; font-size: 24px; margin-bottom: 4px; }
+.results-title.you-won { color: #ffd700; text-shadow: 0 0 20px rgba(255,215,0,0.6); animation: victoryShimmer 1.4s ease-in-out infinite; }
+.results-title.you-lost { color: #cfd0e0; }
+@keyframes victoryShimmer { 0%, 100% { text-shadow: 0 0 20px rgba(255,215,0,0.6); } 50% { text-shadow: 0 0 36px rgba(255,255,255,0.9), 0 0 50px rgba(255,215,0,0.9); } }
+.results-subtitle { color: #7d829c; font-size: 13px; margin-bottom: 22px; }
+.results-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; max-height: 260px; overflow-y: auto; }
+.results-row {
+  display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07); border-radius: 10px; padding: 10px 14px; text-align: left;
+}
+.results-row.is-winner { border-color: rgba(255,215,0,0.4); background: rgba(255,215,0,0.06); }
+.results-place { font-family: 'DynaPuff', Arial, sans-serif; font-size: 14px; color: #ffcf4d; width: 28px; flex-shrink: 0; }
+.results-name { flex: 1; font-size: 13.5px; font-weight: bold; }
+.results-reward { color: #26da72; font-size: 12.5px; font-weight: bold; }
+.results-close-btn {
+  width: 100%; border: none; border-radius: 10px; padding: 12px; background: #2f6fed; color: #fff;
+  font-weight: bold; font-size: 13.5px; cursor: pointer;
+}
+.confetti-piece {
+  position: absolute; top: -20px; width: 8px; height: 14px; z-index: 1; opacity: 0.9;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  to { transform: translateY(110vh) rotate(540deg); opacity: 0.2; }
+}
+
+
+.picker-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+  display: flex; justify-content: center; align-items: center; z-index: 250;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.picker-overlay.active { opacity: 1; pointer-events: auto; }
+.picker-box {
+  width: 92%; max-width: 420px; max-height: 80vh; background: #14101f; border: 1px solid rgba(150,120,255,0.25);
+  border-radius: 18px; padding: 24px; font-family: Arial, sans-serif; color: #e8e8f0;
+}
+.picker-box h3 { font-family: 'DynaPuff', Arial, sans-serif; font-size: 16px; color: #fff; margin-bottom: 14px; }
+.picker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 300px; overflow-y: auto; margin-bottom: 14px; }
+.picker-tile { cursor: pointer; text-align: center; padding: 8px 4px; border-radius: 10px; border: 2px solid transparent; }
+.picker-tile:hover { background: rgba(255,255,255,0.05); }
+.picker-tile-icon { width: 44px; height: 44px; margin: 0 auto 4px auto; border-radius: 10px; background: #23233d; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.picker-tile-icon img { width: 75%; height: 75%; object-fit: contain; }
+.picker-tile-name { font-size: 9px; color: #9096b3; }
+.picker-cancel-btn { width: 100%; background: transparent; border: none; color: #7d829c; padding: 6px; cursor: pointer; }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DynaPuff:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style id="manglet-rehost-theme">
+:root {
+  --manglet-panel: #17191f;
+  --manglet-panel-2: #20232b;
+  --manglet-border: rgba(255,255,255,.09);
+  --manglet-text: #f4f5f7;
+  --manglet-muted: #9ba2b2;
+  --manglet-shadow: 0 14px 40px rgba(0,0,0,.22);
+  --manglet-radius: 18px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; scroll-behavior: smooth; }
+body {
+  background: var(--bg-color, #17100c) !important;
+  color: var(--manglet-text) !important;
+  font-family: 'Space Grotesk', Arial, sans-serif !important;
+  line-height: 1.5;
+}
+.sidebar {
+  width: 250px !important; background: var(--sidebar-color, #24160f) !important;
+  border-right: 1px solid rgba(255,255,255,.07);
+  padding: 22px 12px !important; box-shadow: 8px 0 30px rgba(0,0,0,.12);
+  overflow-y: auto; overflow-x: hidden;
+}
+.sidebar-logo {
+  font-family: 'DynaPuff','Space Grotesk',sans-serif !important;
+  font-size: 25px !important; letter-spacing: .5px !important;
+  color: #fff !important; padding: 0 12px 26px !important;
+}
+.sidebar-nav { gap: 5px; }
+.sidebar-nav a {
+  color: #c6cad4 !important; font: 600 13.5px 'Space Grotesk',sans-serif !important;
+  padding: 11px 13px !important; border-radius: 12px; margin: 0 2px;
+  gap: 11px !important; min-height: 42px; transition: background .18s, color .18s, transform .18s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: var(--sidebar-hover, #382216) !important; color: #fff !important;
+}
+.sidebar-nav a.active { box-shadow: inset 3px 0 0 var(--token-accent, #ff8c32); }
+.topbar { left: 250px !important; padding: 18px 24px !important; gap: 10px !important; }
+.token-display, .ruby-display {
+  border: 1px solid rgba(255,255,255,.12); border-radius: 13px !important;
+  padding: 8px 13px !important; box-shadow: 0 5px 16px rgba(0,0,0,.16);
+  font: 700 13px 'Space Grotesk',sans-serif !important;
+}
+.token-display { background: var(--token-accent, #ff8c32) !important; color: #fff !important; }
+.ruby-display { background: #a92d5b !important; color: #fff !important; }
+.main-content { margin-left: 250px !important; padding: 104px 28px 44px !important; min-width: 0; }
+.page-title, .owner-title, .profile-name, .section-title, .chat-panel-title, .picker-box h3, .title {
+  font-family: 'DynaPuff','Space Grotesk',sans-serif !important;
+  color: var(--manglet-text) !important; letter-spacing: -.3px;
+}
+.page-title { font-size: clamp(25px,3vw,34px) !important; }
+.page-subtitle, .owner-subtitle { color: var(--manglet-muted) !important; }
+.trade-wrap, .shop-wrap, .profile-wrap, .owner-wrap, .credits-wrap { max-width: 1240px; }
+.panel-card, .room-panel, .trade-list-card, .stat-card, .stat-tile, .shop-item-card,
+.shop-info-card, .collection-card, .clan-card, .profile-card, .card, .admin-row,
+.bazaar-card, .battle-card, .news-card, .leaderboard-card, .chat-panel,
+[class*="panel"], [class*="card"] {
+  border-color: var(--manglet-border);
+}
+.room-panel, .trade-list-card, .panel-card, .stat-card, .stat-tile, .shop-item-card,
+.shop-info-card, .collection-card, .clan-card, .profile-card, .card, .admin-row,
+.bazaar-card, .battle-card, .news-card, .leaderboard-card {
+  background: var(--manglet-panel) !important;
+  border-radius: var(--manglet-radius) !important;
+  box-shadow: var(--manglet-shadow);
+}
+input, textarea, select, .new-trade-row input, .chat-input-row input, .offer-tokens-row {
+  font-family: 'Space Grotesk',sans-serif !important;
+  border-radius: 12px !important;
+}
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+  background-color: var(--manglet-panel-2) !important;
+  color: var(--manglet-text) !important; border-color: var(--manglet-border) !important;
+}
+button, .button, .btn, .shop-buy-btn, .add-blook-btn, .list-tab-btn, .friends-tab-btn,
+.profile-action-btn, .wide-btn {
+  font-family: 'Space Grotesk',sans-serif !important; font-weight: 700 !important;
+  border-radius: 12px !important; transition: transform .16s, filter .16s, background .16s;
+}
+button:hover:not(:disabled), .button:hover, .btn:hover { filter: brightness(1.08); }
+button:active:not(:disabled) { transform: translateY(1px); }
+.list-tab-btn, .friends-tab-btn {
+  background: var(--manglet-panel) !important; border: 1px solid var(--manglet-border) !important;
+  color: var(--manglet-muted) !important;
+}
+.list-tab-btn.active, .friends-tab-btn.active {
+  background: var(--token-accent) !important; border-color: var(--token-accent) !important; color: #fff !important;
+}
+.room-back-btn { color: var(--manglet-muted) !important; }
+.room-footer { border-radius: 14px !important; }
+.offer-blook-icon, .picker-tile-icon, .room-avatar, .trade-list-avatar { border-radius: 13px !important; }
+.picker-box { background: var(--manglet-panel) !important; border: 1px solid var(--manglet-border) !important; border-radius: 20px !important; }
+.page-header-row { gap: 14px; }
+a { transition: color .16s, background .16s; }
+@media (max-width: 900px) {
+  .sidebar { width: 76px !important; padding: 18px 7px !important; }
+  .sidebar-logo { font-size: 0 !important; padding: 0 0 24px !important; text-align: center; }
+  .sidebar-logo::after { content: 'M'; font: 700 27px 'DynaPuff',sans-serif; color: var(--token-accent,#ff8c32); }
+  .sidebar-nav a { justify-content: center; padding: 12px 5px !important; gap: 0 !important; font-size: 0 !important; min-height: 44px; }
+  .sidebar-nav a .manglet-nav-icon { font-size: 21px !important; }
+  .topbar { left: 76px !important; padding: 13px 14px !important; }
+  .main-content { margin-left: 76px !important; padding: 86px 16px 32px !important; }
+}
+@media (max-width: 560px) {
+  .main-content { padding: 84px 12px 24px !important; }
+  .topbar { gap: 6px !important; }
+  .token-display, .ruby-display { padding: 6px 8px !important; font-size: 11px !important; }
+  .token-display img, .ruby-display img { width: 18px !important; height: 18px !important; }
+  .room-panel, .panel-card { padding: 15px !important; }
+  .room-footer button { padding: 14px 8px !important; font-size: 12px !important; }
+}
+</style>
+
+
+<style id="manglet-unified-navigation">
+:root{--bg-color:#17100c;--sidebar-color:#24160f;--sidebar-hover:#382216;--token-accent:#ff8c32;--panel:#1d2027;--panel2:#252933;--border:rgba(255,255,255,.09);--text:#f5f6fa;--muted:#a1a7b5}
+*{box-sizing:border-box}
+html{min-height:100%;scroll-behavior:smooth}
+body{margin:0!important;min-height:100vh;background:var(--bg-color)!important;color:var(--text,#f5f6fa)!important;font-family:'Space Grotesk',sans-serif!important}
+.sidebar{position:fixed!important;inset:0 auto 0 0!important;width:250px!important;background:var(--sidebar-color)!important;padding:22px 12px!important;border-right:1px solid var(--border)!important;box-shadow:8px 0 30px #0002;overflow-y:auto;overflow-x:hidden;z-index:20}
+.sidebar-logo{font:700 25px 'DynaPuff',sans-serif!important;color:var(--text,#f5f6fa)!important;padding:0 12px 26px!important;letter-spacing:0!important}
+.sidebar-nav{display:flex!important;flex-direction:column!important;gap:5px!important;flex:1}
+.sidebar-nav a{display:flex!important;align-items:center!important;gap:10px!important;text-decoration:none!important;color:#c6cad4!important;padding:11px 13px!important;border-radius:12px!important;font:600 13.5px 'Space Grotesk',sans-serif!important;transition:background .18s,color .18s,transform .18s}
+.sidebar-nav a:hover,.sidebar-nav a.active{background:var(--sidebar-hover)!important;color:#fff!important}
+.sidebar-nav a.active{box-shadow:inset 3px 0 var(--token-accent)!important}
+.sidebar-nav .material-icons{font-size:20px!important;line-height:1;flex:0 0 20px}
+.topbar{position:fixed!important;top:0!important;left:250px!important;right:0!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;padding:18px 24px!important;z-index:15!important;pointer-events:none}
+.token-display,.ruby-display{padding:8px 13px!important;border-radius:12px!important;background:var(--token-accent)!important;color:#fff!important;font-weight:700!important;margin-left:8px!important;box-shadow:0 6px 18px #0002}
+.ruby-display{background:#a92d5b!important}
+.token-display img,.ruby-display img{max-height:19px;max-width:19px;object-fit:contain;vertical-align:middle}
+.main-content{margin-left:250px!important;padding:100px 28px 44px!important;min-width:0}
+.page-title,.title,h1{font-family:'DynaPuff',sans-serif!important;color:var(--text,#f5f6fa)}
+.page-title,.title{font-size:clamp(27px,4vw,36px)!important;line-height:1.2;margin:8px 0 12px!important}
+.page-subtitle,.subtitle,.owner-subtitle{color:var(--muted,#a1a7b5)!important}
+.panel,.panel-card,.room-panel,.trade-list-card,.stat-card,.stat-tile,.shop-item-card,.shop-info-card,.credits-card,.settings-card,.content-card,.card{border-radius:18px!important;border:1px solid var(--border)!important;box-shadow:0 14px 40px #0003}
+button,.btn,input[type=button],input[type=submit]{border-radius:12px!important;font-family:'Space Grotesk',sans-serif!important}
+input,select,textarea{font-family:'Space Grotesk',sans-serif!important;border-radius:10px}
+a{transition:color .18s,background .18s}
+@media(max-width:900px){.sidebar{width:76px!important;padding:18px 7px!important}.sidebar-logo{font-size:0!important;text-align:center;padding:0 0 24px!important}.sidebar-logo:after{content:'M';font:700 27px 'DynaPuff',sans-serif;color:var(--token-accent)}.sidebar-nav a{justify-content:center!important;gap:0!important;font-size:0!important;padding:12px 5px!important}.sidebar-nav .material-icons{font-size:21px!important;flex:0 0 auto}.topbar{left:76px!important;padding:13px!important}.main-content{margin-left:76px!important;padding:86px 16px 32px!important}}
+@media(max-width:560px){.main-content{padding:84px 12px 24px!important}.panel,.panel-card,.room-panel,.trade-list-card,.stat-card,.stat-tile,.shop-item-card,.shop-info-card{padding:17px!important}.topbar{padding:10px!important}.token-display,.ruby-display{padding:7px 9px!important;font-size:12px}}
+</style>
+
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-logo">Manglet Rehost</div>
+<nav class="sidebar-nav">
+<a href="dashboard"><span class="material-icons">storefront</span>Market</a>
+<a href="chat"><span class="material-icons">forum</span>Global Chat</a>
+<a href="collection"><span class="material-icons">inventory_2</span>Collection</a>
+<a href="clans"><span class="material-icons">groups</span>Clans</a>
+<a href="news"><span class="material-icons">newspaper</span>News</a>
+<a href="trade"><span class="material-icons">swap_horiz</span>Trade</a>
+<a href="bazaar"><span class="material-icons">store</span>Bazaar</a>
+<a href="battle" class="active"><span class="material-icons">sports_esports</span>Battle Royale</a>
+<a href="leaderboard"><span class="material-icons">leaderboard</span>Leaderboard</a>
+<a href="rubyshop"><span class="material-icons">diamond</span>Ruby Shop</a>
+<a href="credits"><span class="material-icons">favorite</span>Credits</a>
+<a href="settings"><span class="material-icons">settings</span>Settings</a>
+<a href="profile"><span class="material-icons">person</span>Profile</a>
+</nav>
+</div>
+
+<div class="topbar">
+<div class="token-display">
+<img src="coin.png" alt="coin" onerror="this.style.display='none'">
+<span id="tokenBalance">0</span>
+</div>
+<div class="ruby-display">
+<img src="ruby.png" alt="ruby" onerror="this.style.display='none'">
+<span id="rubyBalance">0</span>
+</div>
+</div>
+
+<div class="main-content">
+<div class="battle-wrap">
+
+  <div class="battle-header">
+    <div class="battle-header-icon">⚔️</div>
+    <div>
+      <div class="battle-title">Battle Royale</div>
+      <div class="battle-subtitle">Stay inside the shrinking zone. Last one standing wins big.</div>
+    </div>
+  </div>
+
+  
+  <div id="lobbyView">
+    <div class="panel-card">
+      <div class="panel-title">🎨 Your Battle Icon</div>
+      <div class="panel-desc">Pick one of your owned blooks to represent you in the arena.</div>
+      <div class="icon-picker-row">
+        <div class="picked-icon-preview" id="pickedIconPreview"><span class="placeholder">?</span></div>
+        <button class="choose-icon-btn" onclick="openIconPicker()">Choose Blook</button>
+      </div>
+      <button class="big-action-btn btn-join" id="joinLeaveBtn" onclick="handleJoinLeave()">Join Lobby</button>
+    </div>
+
+    <div class="panel-card">
+      <div class="lobby-status-row">
+        <div class="lobby-count" id="lobbyCount">0 / 2 players</div>
+        <div class="countdown-pill" id="countdownPill" style="display:none;"></div>
+      </div>
+      <div class="lobby-players-grid" id="lobbyPlayersGrid"></div>
+    </div>
+  </div>
+
+  
+  <div id="arenaView" class="arena-wrap">
+    <div class="arena-hud">
+      <div class="arena-hud-item">
+        <div class="arena-hud-value" id="hudAlive">0</div>
+        <div class="arena-hud-label">Alive</div>
+      </div>
+      <div class="arena-hud-item">
+        <div class="arena-hud-value" id="hudHp">100</div>
+        <div class="arena-hud-label">Your HP</div>
+      </div>
+      <div class="arena-hud-item">
+        <div class="arena-hud-value danger" id="hudZone">Safe</div>
+        <div class="arena-hud-label">Zone Status</div>
+      </div>
+    </div>
+    <div style="position:relative;">
+      <canvas id="battleCanvas" width="800" height="800"></canvas>
+      <div class="you-eliminated-banner" id="eliminatedBanner">
+        <h2>💀 Eliminated</h2>
+        <p>Watching the rest of the match...</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+</div>
+
+
+<div id="countdownOverlay" class="countdown-overlay">
+  <div class="countdown-number" id="countdownNumber">5</div>
+  <div class="countdown-label">MATCH STARTING</div>
+</div>
+
+
+<div id="resultsOverlay" class="results-overlay">
+  <div id="confettiContainer"></div>
+  <div class="results-box">
+    <div class="results-crown" id="resultsCrown">🏆</div>
+    <div class="results-title" id="resultsTitle">Victory!</div>
+    <div class="results-subtitle" id="resultsSubtitle">Final standings</div>
+    <div class="results-list" id="resultsList"></div>
+    <button class="results-close-btn" onclick="closeResults()">Back to Lobby</button>
+  </div>
+</div>
+
+
+<div id="iconPickerOverlay" class="picker-overlay" onclick="if(event.target===this) closeIconPicker()">
+  <div class="picker-box">
+    <h3>Choose Your Battle Icon</h3>
+    <div class="picker-grid" id="iconPickerGrid"></div>
+    <button class="picker-cancel-btn" onclick="closeIconPicker()">Cancel</button>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const AUTH_TOKEN = localStorage.getItem('mangletSessionToken');
+if (!AUTH_TOKEN) { location.href = "/login"; }
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+async function apiFetch(url, options = {}) {
+  const opts = Object.assign({}, options);
+  opts.headers = Object.assign(
+    { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + AUTH_TOKEN },
+    options.headers || {}
+  );
+  const res = await fetch(url, opts);
+  if (res.status === 401) {
+    localStorage.removeItem('mangletSessionToken');
+    location.href = "/login";
+    throw new Error('Not logged in');
+  }
+  return res;
+}
+function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+
+const socket = io({ auth: { token: AUTH_TOKEN } });
+socket.on('rubyEarned', (data) => {
+  const el = document.getElementById('rubyBalance');
+  if (el) el.innerText = fmt(data.rubies);
+});
+let myUsername = null;
+let selectedIcon = null; 
+let inLobby = false;
+let iAmAlive = true;
+
+
+const PACK_CONFIGS_CLIENT = {
+  spacePack: { rates: [
+    { name: "Earth", item: "blooks/Earth.webp" }, { name: "Meteor", item: "blooks/Meteor.webp" },
+    { name: "Stars", item: "blooks/Stars.webp" }, { name: "Alien", item: "blooks/Alien.webp" },
+    { name: "Planet", item: "blooks/Planet.webp" }, { name: "Spaceship", item: "blooks/Spaceship.webp" },
+    { name: "UFO", item: "blooks/UFO.webp" }, { name: "Astronaut", item: "blooks/Astronaut.webp" },
+    { name: "Space Terminal", item: "blooks/Space Terminal.webp" }, { name: "Space Debugger", item: "blooks/Space Debugger.webp" },
+    { name: "Pink Astronaut", item: "blooks/Pink Astronaut.webp" }, { name: "Red Astronaut", item: "blooks/Red Astronaut.webp" },
+    { name: "Orange Astronaut", item: "blooks/Orange Astronaut.webp" }, { name: "Yellow Astronaut", item: "blooks/Yellow Astronaut.webp" },
+    { name: "Lime Astronaut", item: "blooks/Lime Astronaut.webp" }, { name: "Green Astronaut", item: "blooks/Green Astronaut.webp" },
+    { name: "Cyan Astronaut", item: "blooks/Cyan Astronaut.webp" }, { name: "Blue Astronaut", item: "blooks/Blue Astronaut.webp" },
+    { name: "Purple Astronaut", item: "blooks/Purple Astronaut.webp" }, { name: "Brown Astronaut", item: "blooks/Brown Astronaut.webp" },
+    { name: "Black Astronaut", item: "blooks/Black Astronaut.webp" }, { name: "Tim the Alien", item: "blooks/Tim The Alien.webp" },
+    { name: "Rainbow Astronaut", item: "blooks/Rainbow Astronaut.webp" }
+  ] },
+  medievalPack: { rates: [
+    { name: "Elf", item: "blooks/Elf.webp" }, { name: "Fairy", item: "blooks/Fairy.webp" }, { name: "Slime Monster", item: "blooks/Slime Monster.webp" },
+    { name: "Witch", item: "blooks/Witch.webp" }, { name: "Wizard", item: "blooks/Wizard.webp" }, { name: "Dragon", item: "blooks/Dragon.webp" },
+    { name: "Jester", item: "blooks/Jester.webp" }, { name: "Queen", item: "blooks/Queen.webp" }, { name: "Unicorn", item: "blooks/Unicorn.webp" },
+    { name: "King", item: "blooks/King.webp" }, { name: "Phantom King", item: "blooks/Phantom King.webp" }
+  ] },
+  blizzardPack: { rates: [ { name: "Snowman", item: "snowman.png" }, { name: "Penguin", item: "penguin.png" }, { name: "Frost Giant", item: "frostgiant.png" } ] },
+  cyberPack: { rates: [
+    { name: "Angry Bot", item: "blooks/Angry Bot.webp" }, { name: "Happy Bot", item: "blooks/Happy Bot.webp" },
+    { name: "Lil Bot", item: "blooks/Lil Bot.webp" }, { name: "Lovely Bot", item: "blooks/Lovely Bot.webp" },
+    { name: "Buddy Bot", item: "blooks/Buddy Bot.webp" }, { name: "Watson", item: "blooks/Watson.webp" },
+    { name: "Brainy Bot", item: "blooks/Brainy Bot.webp" }, { name: "Mega Bot", item: "blooks/Mega Bot.webp" }
+  ] },
+  breakfastpack: { rates: [
+    { name: "Toast", item: "blooks/Toast.webp" }, { name: "Cereal", item: "blooks/Cereal.webp" }, { name: "Yogurt", item: "blooks/Yogurt.webp" },
+    { name: "Breakfast Combo", item: "blooks/Breakfast Combo.webp" }, { name: "Orange Juice", item: "blooks/Orange Juice.webp" }, { name: "Milk", item: "blooks/Milk.webp" },
+    { name: "Waffle", item: "blooks/Waffle.webp" }, { name: "Pancakes", item: "blooks/Pancakes.webp" },
+    { name: "French Toast", item: "blooks/French Toast.webp" }, { name: "Pizza", item: "blooks/Pizza.webp" },
+    { name: "Chocolate Milk", item: "blooks/Chocolate Milk.webp" }, { name: "Bacon and Eggs", item: "blooks/Bacon and Eggs.webp" },
+    { name: "Rainbow Waffles", item: "blooks/Rainbow Waffles.webp" }
+  ] },
+  outbackpack:   { rates: [
+    { name: "Dingo", item: "blooks/Dingo.webp" }, { name: "Echidna", item: "blooks/Echidna.webp" }, { name: "Koala", item: "blooks/Koala.webp" },
+    { name: "Kookaburra", item: "blooks/Kookaburra.webp" }, { name: "Platypus", item: "blooks/Platypus.webp" }, { name: "Joey", item: "blooks/Joey.webp" },
+    { name: "Kangaroo", item: "blooks/Kangaroo.webp" }, { name: "Crocodile", item: "blooks/Crocodile.webp" },
+    { name: "Sugar Glider", item: "blooks/SugarGlider.webp" }, { name: "Teal Platypus", item: "blooks/TealPlatypus.webp" }
+  ] },
+  safariPack: { rates: [
+    { name: "Panda", item: "blooks/Panda.webp" }, { name: "Sloth", item: "blooks/Sloth.webp" }, { name: "Tenrec", item: "blooks/Tenrec.webp" },
+    { name: "Flamingo", item: "blooks/Flamingo.webp" }, { name: "Zebra", item: "blooks/Zebra.webp" }, { name: "Elephant", item: "blooks/Elephant.webp" },
+    { name: "Lemur", item: "blooks/Lemur.webp" }, { name: "Peacock", item: "blooks/Peacock.webp" }, { name: "Chameleon", item: "blooks/Chameleon.webp" },
+    { name: "Lion", item: "blooks/Lion.webp" }, { name: "Rainbow Panda", item: "blooks/Rainbow Panda.webp" }
+  ] },
+  bugPack: { rates: [
+    { name: "Ant", item: "blooks/Ant.webp" }, { name: "Rhino Beetle", item: "blooks/Rhino Beetle.webp" },
+    { name: "Ladybug", item: "blooks/Ladybug.webp" }, { name: "Fly", item: "blooks/Fly.webp" },
+    { name: "Worm", item: "blooks/Worm.webp" }, { name: "Bee", item: "blooks/Bee.webp" },
+    { name: "Mantis", item: "blooks/Mantis.webp" }, { name: "Butterfly", item: "blooks/Butterfly.webp" },
+    { name: "Blue Butterfly", item: "blooks/Blue Butterfly.webp" }
+  ] },
+  iceMonstersPack: { rates: [
+    { name: "Ice Bat", item: "blooks/Ice Bat.webp" }, { name: "Ice Bug", item: "blooks/Ice Bug.webp" },
+    { name: "Ice Elemental", item: "blooks/Ice Elemental.webp" }, { name: "Rock Monster", item: "blooks/Rock Monster.webp" },
+    { name: "Dink", item: "blooks/Dink.webp" }, { name: "Donk", item: "blooks/Donk.webp" },
+    { name: "Bush Monsters", item: "blooks/Bush Monsters.webp" }, { name: "Yeti", item: "blooks/Yeti.webp" },
+    { name: "Ice Slime", item: "blooks/Ice Slime.webp" }, { name: "Frozen Fossil", item: "blooks/Frozen Fossil.webp" },
+    { name: "Ice Crab", item: "blooks/Ice Crab.webp" }
+  ] },
+  aquaticPack: { rates: [
+    { name: "Old Boot", item: "blooks/Old Boot.webp" }, { name: "Clownfish", item: "blooks/Clownfish.webp" },
+    { name: "Crab", item: "blooks/Crab.webp" }, { name: "Frog", item: "blooks/Frog.webp" },
+    { name: "Jellyfish", item: "blooks/Jellyfish.webp" }, { name: "Blobfish", item: "blooks/Blobfish.webp" },
+    { name: "Octopus", item: "blooks/Octopus.webp" }, { name: "Pufferfish", item: "blooks/Pufferfish.webp" },
+    { name: "Narwal", item: "blooks/Narwal.webp" }, { name: "Dolphin", item: "blooks/Dolphin.webp" },
+    { name: "Baby Shark", item: "blooks/Baby Shark.webp" }, { name: "Megalodon", item: "blooks/Megalodon.webp" },
+    { name: "Golden Blobfish", item: "blooks/Golden Blobfish.webp" }
+  ] }
+};
+
+let myCollection = {};
+async function loadMe() {
+  const res = await apiFetch('/api/me');
+  const data = await res.json();
+  myUsername = data.user.username;
+  myCollection = data.user.collection || {};
+  document.getElementById('tokenBalance').innerText = fmt(data.user.tokens);
+  const rubyEl = document.getElementById('rubyBalance');
+  if (rubyEl) rubyEl.innerText = fmt(data.user.rubies || 0);
+  applyMangletTheme(data.user.theme);
+  showOwnerNav(data.user.isOwner);
+  socket.emit('registerUser', myUsername);
+}
+
+
+
+
+let iconPickerRows = [];
+function openIconPicker() {
+  const grid = document.getElementById('iconPickerGrid');
+  iconPickerRows = [];
+  Object.entries(PACK_CONFIGS_CLIENT).forEach(([packKey, cfg]) => {
+    cfg.rates.forEach(b => {
+      if ((myCollection[packKey + '::' + b.name] || 0) > 0) iconPickerRows.push(b);
+    });
+  });
+  if (iconPickerRows.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1; color:#565a75; text-align:center; padding:20px 0; font-size:13px;">You don\'t own any blooks yet — open some packs first!</div>';
+  } else {
+    grid.innerHTML = iconPickerRows.map((b, i) => `
+      <div class="picker-tile" onclick="pickIcon(${i})">
+        <div class="picker-tile-icon"><img src="${b.item}" onerror="this.style.display='none'"></div>
+        <div class="picker-tile-name">${b.name}</div>
+      </div>
+    `).join('');
+  }
+  document.getElementById('iconPickerOverlay').classList.add('active');
+}
+function closeIconPicker() {
+  document.getElementById('iconPickerOverlay').classList.remove('active');
+}
+function pickIcon(index) {
+  selectedIcon = iconPickerRows[index];
+  const preview = document.getElementById('pickedIconPreview');
+  preview.innerHTML = `<img src="${selectedIcon.item}" onerror="this.style.display='none'">`;
+  closeIconPicker();
+}
+
+
+
+
+function handleJoinLeave() {
+  if (inLobby) {
+    socket.emit('battleLeaveLobby');
+  } else {
+    socket.emit('battleJoinLobby', { blookImage: selectedIcon ? selectedIcon.item : null });
+  }
+}
+
+socket.on('battleLobbyUpdate', (data) => {
+  const btn = document.getElementById('joinLeaveBtn');
+  inLobby = data.players.some(p => p.username === myUsername);
+  btn.innerText = inLobby ? 'Leave Lobby' : 'Join Lobby';
+  btn.className = 'big-action-btn ' + (inLobby ? 'btn-leave' : 'btn-join');
+
+  document.getElementById('lobbyCount').innerText = `${data.players.length} / ${data.minPlayers} players`;
+
+  const pill = document.getElementById('countdownPill');
+  if (data.state === 'countdown' && data.countdownEndsAt) {
+    pill.style.display = 'block';
+    startLobbyCountdownTicker(data.countdownEndsAt);
+  } else {
+    pill.style.display = 'none';
+  }
+
+  const grid = document.getElementById('lobbyPlayersGrid');
+  if (data.players.length === 0) {
+    grid.innerHTML = '<div class="lobby-empty-note">No one\'s waiting yet — be the first!</div>';
+  } else {
+    grid.innerHTML = data.players.map(p => `
+      <div class="lobby-player-tile">
+        <div class="lobby-player-icon">${p.blookImage ? `<img src="${p.blookImage}" onerror="this.style.display='none'">` : '<span style="color:#565a75;font-size:16px;">?</span>'}</div>
+        <div class="lobby-player-name">${escapeHtml(p.username)}</div>
+      </div>
+    `).join('');
+  }
+});
+
+let lobbyCountdownInterval = null;
+function startLobbyCountdownTicker(endsAt) {
+  clearInterval(lobbyCountdownInterval);
+  const pill = document.getElementById('countdownPill');
+  lobbyCountdownInterval = setInterval(() => {
+    const secs = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
+    pill.innerText = `Starting in ${secs}s`;
+    if (secs <= 0) clearInterval(lobbyCountdownInterval);
+  }, 200);
+}
+
+
+
+
+socket.on('battleMatchStarted', (data) => {
+  document.getElementById('lobbyView').style.display = 'none';
+  document.getElementById('arenaView').style.display = 'block';
+  document.getElementById('eliminatedBanner').style.display = 'none';
+  iAmAlive = true;
+
+  arenaSize = data.arenaSize;
+  arenaCenter = data.center;
+  playerRenderState = {};
+  data.players.forEach(p => {
+    playerRenderState[p.username] = { username: p.username, x: p.x, y: p.y, prevX: p.x, prevY: p.y, targetX: p.x, targetY: p.y, hp: 100, alive: true, blookImage: p.blookImage };
+  });
+  lastTickAt = Date.now();
+  startRenderLoop();
+  enableControls();
+});
+
+
+
+
+const canvas = document.getElementById('battleCanvas');
+const ctx = canvas.getContext('2d');
+let arenaSize = 800;
+let arenaCenter = { x: 400, y: 400 };
+let playerRenderState = {};
+let currentRadius = 380;
+let lastTickAt = Date.now();
+let renderLoopActive = false;
+let particles = [];
+
+socket.on('battleState', (data) => {
+  currentRadius = data.radius;
+  const now = Date.now();
+  data.players.forEach(p => {
+    const existing = playerRenderState[p.username];
+    if (!existing) {
+      playerRenderState[p.username] = { username: p.username, x: p.x, y: p.y, prevX: p.x, prevY: p.y, targetX: p.x, targetY: p.y, hp: p.hp, alive: p.alive };
+      return;
+    }
+    existing.prevX = existing.x; existing.prevY = existing.y;
+    existing.targetX = p.x; existing.targetY = p.y;
+    if (existing.alive && !p.alive) {
+      spawnEliminationParticles(existing.x, existing.y);
+      if (p.username === myUsername) {
+        iAmAlive = false;
+        document.getElementById('eliminatedBanner').style.display = 'block';
+      }
+    }
+    existing.hp = p.hp;
+    existing.alive = p.alive;
+  });
+  lastTickAt = now;
+
+  const alive = data.players.filter(p => p.alive);
+  document.getElementById('hudAlive').innerText = alive.length;
+  const me = data.players.find(p => p.username === myUsername);
+  if (me) document.getElementById('hudHp').innerText = Math.round(me.hp);
+  const zoneEl = document.getElementById('hudZone');
+  if (me && Math.hypot(me.x - arenaCenter.x, me.y - arenaCenter.y) > currentRadius) {
+    zoneEl.innerText = 'OUTSIDE!'; zoneEl.classList.add('danger');
+  } else {
+    zoneEl.innerText = 'Safe'; zoneEl.classList.remove('danger');
+  }
+});
+
+function spawnEliminationParticles(x, y) {
+  for (let i = 0; i < 18; i++) {
+    particles.push({
+      x, y,
+      vx: (Math.random() - 0.5) * 8,
+      vy: (Math.random() - 0.5) * 8,
+      life: 1,
+      color: `hsl(${Math.random() * 30}, 90%, 60%)`
+    });
+  }
+}
+
+function startRenderLoop() {
+  if (renderLoopActive) return;
+  renderLoopActive = true;
+  requestAnimationFrame(renderFrame);
+}
+
+function renderFrame() {
+  const scale = canvas.width / arenaSize;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  const t = Math.min(1, (Date.now() - lastTickAt) / 150);
+
+  ctx.save();
+  ctx.fillStyle = 'rgba(120,0,0,0.18)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+
+  const cx = arenaCenter.x * scale, cy = arenaCenter.y * scale, r = currentRadius * scale;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.clip();
+  ctx.clearRect(cx - r, cy - r, r * 2, r * 2);
+  ctx.restore();
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, 0, Math.PI * 2);
+  ctx.strokeStyle = '#22d3ee';
+  ctx.lineWidth = 3;
+  ctx.shadowColor = '#22d3ee';
+  ctx.shadowBlur = 20;
+  ctx.stroke();
+  ctx.restore();
+
+  Object.values(playerRenderState).forEach(p => {
+    const x = (p.prevX + (p.targetX - p.prevX) * t) * scale;
+    const y = (p.prevY + (p.targetY - p.prevY) * t) * scale;
+    if (!p.alive) return;
+
+    ctx.save();
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.arc(x, y, 22, 0, Math.PI * 2);
+    ctx.strokeStyle = p.username === myUsername ? '#26da72' : '#ff6bcb';
+    ctx.lineWidth = 3;
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.shadowBlur = 12;
+    ctx.stroke();
+    ctx.restore();
+
+    if (p.blookImage) {
+      if (!p.imgEl) {
+        p.imgEl = new Image();
+        p.imgEl.src = p.blookImage;
+      }
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, 18, 0, Math.PI * 2);
+      ctx.clip();
+      try { ctx.drawImage(p.imgEl, x - 18, y - 18, 36, 36); } catch (e) {}
+      ctx.restore();
+    } else {
+      ctx.save();
+      ctx.beginPath();
+      ctx.arc(x, y, 18, 0, Math.PI * 2);
+      ctx.fillStyle = '#3a2e5c';
+      ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 16px Arial';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(p.username.charAt(0).toUpperCase(), x, y);
+      ctx.restore();
+    }
+
+    ctx.save();
+    ctx.fillStyle = 'rgba(0,0,0,0.5)';
+    ctx.fillRect(x - 20, y - 32, 40, 5);
+    ctx.fillStyle = p.hp > 50 ? '#26da72' : (p.hp > 20 ? '#ffcf4d' : '#ff4444');
+    ctx.fillRect(x - 20, y - 32, 40 * Math.max(0, p.hp) / 100, 5);
+    ctx.restore();
+
+    ctx.save();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 10px Arial';
+    ctx.textAlign = 'center';
+    ctx.fillText(p.username, x, y + 34);
+    ctx.restore();
+  });
+
+  particles = particles.filter(pt => pt.life > 0);
+  particles.forEach(pt => {
+    pt.x += pt.vx; pt.y += pt.vy; pt.life -= 0.03;
+    ctx.save();
+    ctx.globalAlpha = Math.max(0, pt.life);
+    ctx.fillStyle = pt.color;
+    ctx.fillRect(pt.x * scale - 3, pt.y * scale - 3, 6, 6);
+    ctx.restore();
+  });
+
+  requestAnimationFrame(renderFrame);
+}
+
+
+
+
+let heldKeys = {};
+let controlsEnabled = false;
+function enableControls() { controlsEnabled = true; }
+
+window.addEventListener('keydown', (e) => { heldKeys[e.key.toLowerCase()] = true; });
+window.addEventListener('keyup', (e) => { heldKeys[e.key.toLowerCase()] = false; });
+
+setInterval(() => {
+  if (!controlsEnabled || !iAmAlive) return;
+  let dx = 0, dy = 0;
+  if (heldKeys['arrowleft'] || heldKeys['a']) dx -= 1;
+  if (heldKeys['arrowright'] || heldKeys['d']) dx += 1;
+  if (heldKeys['arrowup'] || heldKeys['w']) dy -= 1;
+  if (heldKeys['arrowdown'] || heldKeys['s']) dy += 1;
+  socket.emit('battleMove', { dx, dy });
+}, 100);
+
+
+
+
+socket.on('battleEnded', (data) => {
+  document.getElementById('lobbyView').style.display = 'block';
+  document.getElementById('arenaView').style.display = 'none';
+  controlsEnabled = false;
+
+  const won = data.winner === myUsername;
+  document.getElementById('resultsCrown').innerText = won ? '🏆' : '💀';
+  document.getElementById('resultsTitle').innerText = won ? 'VICTORY!' : 'Match Over';
+  document.getElementById('resultsTitle').className = 'results-title ' + (won ? 'you-won' : 'you-lost');
+  document.getElementById('resultsSubtitle').innerText = won ? 'You won the whole match!' : `${data.winner || 'Someone'} won this round.`;
+
+  document.getElementById('resultsList').innerHTML = data.results.map(r => `
+    <div class="results-row ${r.place === 1 ? 'is-winner' : ''}">
+      <div class="results-place">#${r.place}</div>
+      <div class="results-name">${escapeHtml(r.username)}${r.username === myUsername ? ' (You)' : ''}</div>
+      <div class="results-reward">+${fmt(r.reward)} 🪙</div>
+    </div>
+  `).join('');
+
+  if (won) spawnConfetti();
+  document.getElementById('resultsOverlay').classList.add('active');
+  loadMe();
+});
+
+function spawnConfetti() {
+  const container = document.getElementById('confettiContainer');
+  container.innerHTML = '';
+  const colors = ['#ffd700', '#ff6bcb', '#26da72', '#3b82f6', '#a855f7', '#ff9f43'];
+  for (let i = 0; i < 60; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+    piece.style.left = Math.random() * 100 + '%';
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = (2 + Math.random() * 2) + 's';
+    piece.style.animationDelay = (Math.random() * 0.5) + 's';
+    container.appendChild(piece);
+  }
+}
+
+function closeResults() {
+  document.getElementById('resultsOverlay').classList.remove('active');
+}
+
+loadMe();
+</script>
+
+<script id="manglet-rehost-nav-icons">
+(() => {
+  const iconMap = {
+    'Market':'storefront','Shop':'shopping-bag','Global Chat':'forum','Collection':'inventory_2',
+    'Clans':'groups','News':'newspaper','Trade':'swap_horiz','Bazaar':'store',
+    'Battle Royale':'sports_esports','Leaderboard':'leaderboard','Ruby Shop':'diamond',
+    'Credits':'favorite','Settings':'settings','Profile':'person','Admin Panel':'admin_panel_settings',
+    'Owner Panel':'verified_user'
+  };
+  document.querySelectorAll('.sidebar-nav a').forEach(a => {
+    const label = a.textContent.trim();
+    const icon = iconMap[label];
+    if (icon && !a.querySelector('.manglet-nav-icon')) {
+      const span = document.createElement('span');
+      span.className = 'material-icons manglet-nav-icon';
+      span.setAttribute('aria-hidden','true');
+      span.textContent = icon;
+      span.style.fontSize = '19px';
+      span.style.lineHeight = '1';
+      a.prepend(span);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Manglet Rehost | Register</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800;900&family=DynaPuff:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<style>
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    min-height: 100%;
+}
+
+body {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    min-width: 0;
+}
+
+html, body {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+::-webkit-scrollbar {
+    display: none;
+}
+
+:root {
+    --bg: #130600;
+    --bg-deep: rgba(8, 2, 0, 0.88);
+    --surface: rgba(255, 255, 255, 0.05);
+    --border: rgba(255, 202, 40, 0.18);
+    --gold: #ffca28;
+    --text: #fff3dc;
+    --text-muted: rgba(255, 243, 220, 0.62);
+    --btn-primary-top: #FFE44D;
+    --btn-primary-bot: #FF9500;
+    --btn-secondary-top: #FFC928;
+    --btn-secondary-bot: #FF7A18;
+    --btn-text: #2d0800;
+    --radius-card: 16px;
+    --radius-btn: 10px;
+}
+
+body {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    position: relative;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    pointer-events: none;
+    opacity: .055;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='250' height='250' filter='url(%23n)'/></svg>");
+    background-size: 250px 250px;
+}
+
+.bg-base-gradient {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(ellipse 80% 50% at 20% -5%, #c45200 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 85% 105%, #6b2200 0%, transparent 50%),
+        var(--bg);
+}
+
+.navbar {
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: var(--bg-deep);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    position: sticky;
+    top: 0;
+    z-index: 200;
+}
+
+.logo-link {
+    text-decoration: none;
+    display: inline-block;
+}
+
+.logo {
+    font-family: 'DynaPuff', cursive;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    font-size: .875rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    padding: 11px 20px;
+    border-radius: var(--radius-btn);
+    letter-spacing: .1px;
+    text-align: center;
+    transition: opacity .12s, transform .1s, filter .12s;
+    box-shadow: 0 2px 0 rgba(122, 58, 0, .65);
+}
+
+.btn:hover {
+    opacity: .9;
+    transform: translateY(-1px);
+    filter: brightness(1.04);
+}
+
+.btn:active {
+    opacity: .78;
+    transform: translateY(0);
+}
+
+.btn:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.primary {
+    background: linear-gradient(180deg, var(--btn-primary-top) 0%, var(--btn-primary-bot) 100%);
+    color: var(--btn-text);
+}
+
+.secondary {
+    background: linear-gradient(180deg, var(--btn-secondary-top) 0%, var(--btn-secondary-bot) 100%);
+    color: var(--btn-text);
+    border: 1px solid rgba(255, 202, 40, .25);
+}
+
+.auth-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 48px 20px;
+    position: relative;
+    z-index: 5;
+}
+
+.auth-card {
+    max-width: 480px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 32px;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 18px 55px rgba(0, 0, 0, .25);
+    text-align: center;
+}
+
+.auth-card h2 {
+    font-family: 'DynaPuff', cursive;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 5vw, 2.35rem);
+    line-height: 1.15;
+    margin: 0 0 10px;
+    text-shadow: 0 3px 0 rgba(0, 0, 0, .2);
+}
+
+.auth-card > p {
+    color: var(--text-muted);
+    font-weight: 600;
+    line-height: 1.6;
+    margin: 0 0 26px;
+}
+
+.form-group {
+    margin-bottom: 18px;
+    text-align: left;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 700;
+    font-size: .9rem;
+    margin-bottom: 8px;
+    color: var(--text);
+    letter-spacing: .1px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-wrapper .material-icons {
+    position: absolute;
+    left: 14px;
+    font-size: 1.25rem;
+    color: rgba(255, 202, 40, .7);
+    pointer-events: none;
+}
+
+.form-input, .form-textarea {
+    width: 100%;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 202, 40, .2);
+    background: rgba(8, 2, 0, .42);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    font-size: .95rem;
+    outline: none;
+    transition: background .2s, border-color .2s, box-shadow .2s;
+}
+
+.form-input {
+    padding: 13px 14px 13px 44px;
+}
+
+.form-input.no-icon {
+    padding: 13px 14px;
+}
+
+.form-textarea {
+    padding: 14px;
+    resize: none;
+    min-height: 80px;
+}
+
+.form-input:focus, .form-textarea:focus {
+    background: rgba(8, 2, 0, .65);
+    border-color: #ffca28;
+    box-shadow: 0 0 0 3px rgba(255, 202, 40, .12);
+}
+
+.form-input::placeholder, .form-textarea::placeholder {
+    color: rgba(255, 243, 220, .35);
+}
+
+.message-card {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: .9rem;
+    margin: 14px 0 16px;
+    text-align: left;
+    overflow-wrap: anywhere;
+}
+
+.message-card .material-icons {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+}
+
+.submit-btn {
+    width: 100%;
+    margin: 5px 0 20px;
+}
+
+.switch-auth {
+    font-size: .9rem;
+    font-weight: 600;
+    color: var(--text-muted);
+}
+
+.switch-auth a {
+    color: #ffca28;
+    text-decoration: none;
+    font-weight: 800;
+    border-bottom: 1px solid transparent;
+    transition: border-color .2s;
+}
+
+.switch-auth a:hover {
+    border-color: #ffca28;
+}
+
+footer {
+    margin-top: auto;
+    padding: 20px 30px;
+    text-align: center;
+    background: var(--bg-deep);
+    border-top: 1px solid var(--border);
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    position: relative;
+    z-index: 5;
+    backdrop-filter: blur(14px);
+}
+
+.strength-meter-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin: 8px 0 6px;
+}
+
+.strength-bar {
+    height: 6px;
+    width: 100%;
+    background: rgba(255, 243, 220, .12);
+    border-radius: 99px;
+    overflow: hidden;
+    position: relative;
+}
+
+.strength-fill {
+    height: 100%;
+    width: 0%;
+    border-radius: 99px;
+    transition: width .3s ease, background-color .3s ease;
+}
+
+.strength-text {
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    white-space: nowrap;
+}
+
+.owner-section {
+    display: none;
+    margin: 0 0 18px;
+    text-align: left;
+    border: 1px solid rgba(255, 202, 40, .16);
+    border-radius: 10px;
+    background: rgba(8, 2, 0, .2);
+    overflow: hidden;
+}
+
+.owner-section.is-visible {
+    display: block;
+}
+
+.owner-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 14px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: .9rem;
+    font-weight: 800;
+    text-align: left;
+    cursor: pointer;
+    transition: color .2s, background .2s;
+}
+
+.owner-toggle:hover,
+.owner-toggle[aria-expanded="true"] {
+    color: var(--gold);
+    background: rgba(255, 202, 40, .04);
+}
+
+.owner-arrow {
+    font-size: 1.4rem;
+    color: var(--gold);
+    transition: transform .3s ease;
+}
+
+.owner-toggle[aria-expanded="true"] .owner-arrow {
+    transform: rotate(180deg);
+}
+
+.owner-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        grid-template-rows .3s ease,
+        opacity .22s ease,
+        visibility .3s;
+}
+
+.owner-content.is-open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    visibility: visible;
+}
+
+.owner-inner {
+    min-height: 0;
+    overflow: hidden;
+    padding: 0 14px;
+    transition: padding .3s ease;
+}
+
+.owner-content.is-open .owner-inner {
+    padding: 4px 14px 0;
+}
+
+.owner-inner .form-group {
+    margin-bottom: 14px;
+}
+
+.owner-toggle:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: -3px;
+}
+
+@media (max-width: 700px) {
+    .navbar {
+        min-height: 60px;
+        justify-content: center;
+        padding: 12px 16px;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+    }
+
+    .auth-container {
+        padding: 32px 16px;
+    }
+
+    .auth-card {
+        padding: 26px 20px;
+    }
+
+    footer {
+        padding: 18px 16px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .owner-content,
+    .owner-inner,
+    .owner-arrow,
+    .owner-toggle {
+        transition: none;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg-base-gradient"></div>
+
+<nav class="navbar">
+    <a href="/" class="logo-link">
+        <div class="logo">Manglet Rehost</div>
+    </a>
+</nav>
+
+<main class="auth-container">
+    <div class="auth-card">
+        <h2>Register</h2>
+        <p>Create your account below</p>
+
+        <form id="register-form" action="#" method="POST" novalidate>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <div class="input-wrapper">
+                    <span class="material-icons">person</span>
+                    <input
+                        type="text"
+                        id="username"
+                        name="username"
+                        class="form-input"
+                        placeholder="Choose a username"
+                        autocomplete="username"
+                        required
+                    >
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="strength-meter-header">
+                    <label for="password" style="margin-bottom: 0;">Password</label>
+                    <span id="strength-text" class="strength-text">Nothing here</span>
+                </div>
+                <div class="input-wrapper">
+                    <span class="material-icons">lock</span>
+                    <input
+                        type="password"
+                        id="password"
+                        name="password"
+                        class="form-input"
+                        placeholder="Create a password"
+                        autocomplete="new-password"
+                        required
+                    >
+                </div>
+                <div class="strength-bar" style="margin-top: 8px;">
+                    <div id="strength-fill" class="strength-fill"></div>
+                </div>
+            </div>
+
+            <div class="owner-section" id="owner-section">
+                <button
+                    type="button"
+                    class="owner-toggle"
+                    id="owner-toggle"
+                    aria-expanded="false"
+                    aria-controls="owner-content"
+                >
+                    <span>Owner Accounts</span>
+                    <span class="material-icons owner-arrow" aria-hidden="true">keyboard_arrow_down</span>
+                </button>
+
+                <div class="owner-content" id="owner-content" inert>
+                    <div class="owner-inner">
+                        <div class="form-group">
+                            <label for="setup-code">
+                                Setup Code
+                                <span style="font-weight: 700; color: rgba(255,255,255,0.5);">(optional)</span>
+                            </label>
+                            <input
+                                type="text"
+                                id="setup-code"
+                                name="setupCode"
+                                class="form-input no-icon"
+                                placeholder="Leave blank unless you have one"
+                                autocomplete="off"
+                            >
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="message-card-box" class="message-card" role="status" aria-live="polite">
+                <span id="card-icon" class="material-icons" aria-hidden="true">error</span>
+                <span id="card-text"></span>
+            </div>
+
+            <button type="submit" id="submit-btn" class="btn primary submit-btn">
+                <span>Register</span>
+            </button>
+        </form>
+
+        <div class="switch-auth">
+            Already have an account? <a href="login">Login</a>
+        </div>
+    </div>
+</main>
+
+<script>
+const form = document.getElementById('register-form');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const setupCodeInput = document.getElementById('setup-code');
+const submitBtn = document.getElementById('submit-btn');
+
+const strengthFill = document.getElementById('strength-fill');
+const strengthText = document.getElementById('strength-text');
+
+const messageCardBox = document.getElementById('message-card-box');
+const cardIcon = document.getElementById('card-icon');
+const cardText = document.getElementById('card-text');
+
+const ownerSection = document.getElementById('owner-section');
+const ownerToggle = document.getElementById('owner-toggle');
+const ownerContent = document.getElementById('owner-content');
+
+document.addEventListener('keydown', (event) => {
+    if (event.code !== 'ShiftRight' || event.repeat) {
+        return;
+    }
+
+    if (event.altKey || event.ctrlKey || event.metaKey) {
+        return;
+    }
+
+    event.preventDefault();
+
+    const isVisible = ownerSection.classList.contains('is-visible');
+    const shouldShow = !isVisible;
+
+    ownerSection.classList.toggle('is-visible', shouldShow);
+
+    if (!shouldShow) {
+        ownerToggle.setAttribute('aria-expanded', 'false');
+        ownerContent.classList.remove('is-open');
+        ownerContent.inert = true;
+    }
+});
+
+ownerToggle.addEventListener('click', () => {
+    const isOpen = ownerToggle.getAttribute('aria-expanded') === 'true';
+    const shouldOpen = !isOpen;
+
+    ownerToggle.setAttribute('aria-expanded', String(shouldOpen));
+    ownerContent.classList.toggle('is-open', shouldOpen);
+    ownerContent.inert = !shouldOpen;
+});
+
+passwordInput.addEventListener('input', () => {
+    const value = passwordInput.value;
+    let score = 0;
+
+    if (!value) {
+        strengthFill.style.width = '0%';
+        strengthFill.style.backgroundColor = 'transparent';
+        strengthText.textContent = 'Nothing here';
+        strengthText.style.color = 'rgba(255, 255, 255, 0.6)';
+        return;
+    }
+
+    if (value.length >= 6) score++;
+    if (value.length >= 10) score++;
+    if (/[A-Z]/.test(value)) score++;
+    if (/[0-9]/.test(value)) score++;
+    if (/[^A-Za-z0-9]/.test(value)) score++;
+
+    if (score <= 2) {
+        strengthFill.style.width = '33%';
+        strengthFill.style.backgroundColor = '#ff4d4d';
+        strengthText.textContent = 'Weak';
+        strengthText.style.color = '#ff4d4d';
+    } else if (score <= 4) {
+        strengthFill.style.width = '66%';
+        strengthFill.style.backgroundColor = '#ffad33';
+        strengthText.textContent = 'Medium';
+        strengthText.style.color = '#ffad33';
+    } else {
+        strengthFill.style.width = '100%';
+        strengthFill.style.backgroundColor = '#2ecc71';
+        strengthText.textContent = 'Strong';
+        strengthText.style.color = '#2ecc71';
+    }
+});
+
+function showCard(text, isError) {
+    cardText.textContent = text;
+    messageCardBox.style.display = 'flex';
+
+    if (isError) {
+        messageCardBox.style.backgroundColor = 'rgba(255, 77, 77, 0.25)';
+        messageCardBox.style.border = '2px solid #ff4d4d';
+        cardIcon.textContent = 'error';
+        cardIcon.style.color = '#ff4d4d';
+        cardText.style.color = '#ff9999';
+    } else {
+        messageCardBox.style.backgroundColor = 'rgba(46, 204, 113, 0.18)';
+        messageCardBox.style.border = '2px solid #2ecc71';
+        cardIcon.textContent = 'check_circle';
+        cardIcon.style.color = '#2ecc71';
+        cardText.style.color = '#a3e4d7';
+    }
+}
+
+form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+
+    const cleanUsername = usernameInput.value.trim();
+    const rawPassword = passwordInput.value;
+    const setupCode = setupCodeInput.value.trim();
+
+    if (!cleanUsername) {
+        showCard('Username required', true);
+        usernameInput.focus();
+        return;
+    }
+
+    if (!rawPassword) {
+        showCard('Password required', true);
+        passwordInput.focus();
+        return;
+    }
+
+    if (rawPassword.length < 6) {
+        showCard('Password must be at least 6 characters', true);
+        passwordInput.focus();
+        return;
+    }
+
+    showCard('Creating account...', false);
+    submitBtn.disabled = true;
+
+    try {
+        const response = await fetch('/api/signup', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                username: cleanUsername,
+                password: rawPassword,
+                setupCode
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+            submitBtn.disabled = false;
+            showCard(data.message || 'Registration failed.', true);
+            return;
+        }
+
+        localStorage.setItem('mangletSessionToken', data.token);
+        window.location.href = 'dashboard';
+    } catch (error) {
+        submitBtn.disabled = false;
+        showCard("send this to support", true);
+    }
+});
+</script>
+
+</body>
+</html>

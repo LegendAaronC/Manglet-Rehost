@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js"></script>
+<title>Manglet Rehost | Admin</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: Arial, sans-serif; }
+:root {
+  --bg-color: #ffe600;
+  --sidebar-color: #ffee00;
+  --sidebar-hover: #ffd000;
+  --token-accent: #ffc400;
+}
+body {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+  display: flex;
+  color: #e8e8f0;
+}
+
+
+.sidebar {
+  width: 250px; background: var(--sidebar-color); min-height: 100vh; display: flex; flex-direction: column;
+  padding: 20px 0; position: fixed; top: 0; left: 0; z-index: 10; font-family: 'DynaPuff', Arial, sans-serif;
+}
+.sidebar-logo { font-size: 28px; font-weight: 900; color: white; padding: 0 20px 24px 20px; letter-spacing: 2px; }
+.sidebar-nav { display: flex; flex-direction: column; flex: 1; }
+.sidebar-nav a { color: #ffffff; text-decoration: none; padding: 12px 20px; font-size: 16px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
+.sidebar-nav a:hover, .sidebar-nav a.active { background: var(--sidebar-hover); color: white; }
+
+
+.topbar {
+  position: fixed; top: 0; left: 250px; right: 0; padding: 20px 24px;
+  display: flex; justify-content: flex-end; align-items: center; gap: 12px; z-index: 10;
+}
+.admin-badge {
+  display: flex; align-items: center; gap: 8px; background: #880000; color: #fff;
+  padding: 8px 16px; border-radius: 8px; font-family: 'DynaPuff', Arial, sans-serif; font-size: 13px; letter-spacing: 0.5px;
+}
+
+.main-content { margin-left: 250px; flex: 1; display: flex; justify-content: center; padding: 100px 20px 80px 20px; }
+
+.admin-wrap { width: 100%; max-width: 760px; display: flex; flex-direction: column; gap: 20px; }
+
+
+.admin-header { display: flex; align-items: center; gap: 14px; margin-bottom: 6px; }
+.admin-header-icon {
+  width: 48px; height: 48px; border-radius: 12px; background: rgba(59,111,237,0.18);
+  border: 1px solid rgba(59,111,237,0.4); display: flex; align-items: center; justify-content: center; font-size: 22px;
+}
+.admin-header-title { font-family: 'DynaPuff', Arial, sans-serif; font-size: 26px; color: #ffffff; }
+.admin-header-subtitle { color: #7d829c; font-size: 13.5px; margin-top: 2px; }
+
+
+.panel-card {
+  background: #14121f;
+  border: 1px solid #262238;
+  border-radius: 16px;
+  padding: 22px 24px;
+}
+.panel-card.danger { border-color: rgba(255,68,68,0.35); }
+
+.panel-title { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 15.5px; margin-bottom: 6px; }
+.panel-title.danger-text { color: #ff6b6b; }
+.panel-desc { color: #7d829c; font-size: 13px; line-height: 1.5; margin-bottom: 14px; }
+
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px;
+  padding: 12px 14px;
+  color: #e8e8f0;
+  font-size: 14px;
+  outline: none;
+  font-family: Arial, sans-serif;
+}
+input::placeholder, textarea::placeholder { color: #5c6079; }
+select { cursor: pointer; }
+textarea { resize: vertical; min-height: 90px; }
+
+
+.target-label { color: #7d829c; font-size: 11px; letter-spacing: 1px; font-weight: 800; margin-bottom: 8px; text-transform: uppercase; }
+
+.status-row { display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.07); border-radius: 8px; padding: 9px 12px; margin-bottom: 8px; font-size: 13px; }
+.status-pill { font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 20px; }
+.status-pill.status-ok { background: rgba(38,218,114,0.15); color: #26da72; }
+.status-pill.status-bad { background: rgba(220,60,60,0.15); color: #ff8080; }
+.status-row button { background: rgba(38,218,114,0.12); color: #26da72; border: 1px solid rgba(38,218,114,0.3); border-radius: 6px; padding: 5px 12px; font-size: 12px; font-weight: bold; cursor: pointer; }
+.status-row button:hover { background: rgba(38,218,114,0.2); }
+.status-not-found { color: #565a75; font-size: 12.5px; padding: 4px 0; }
+
+
+.give-row { display: flex; gap: 10px; }
+.give-row select { flex: 1; }
+.btn-give {
+  background: #2f6fed; color: #fff; border: none; border-radius: 10px; padding: 0 20px;
+  font-weight: bold; font-size: 14px; cursor: pointer; white-space: nowrap;
+}
+.btn-give:hover { background: #3f7dfa; }
+.btn-give:disabled { opacity: 0.4; cursor: not-allowed; }
+
+
+.wide-btn {
+  width: 100%; border-radius: 10px; padding: 13px; font-weight: bold; font-size: 14px;
+  cursor: pointer; border: none; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px;
+  transition: filter 0.1s, opacity 0.1s;
+}
+.wide-btn:disabled { opacity: 0.45; cursor: not-allowed; }
+.wide-btn:not(:disabled):hover { filter: brightness(1.1); }
+
+.btn-gold { background: #614e1b; color: #cca63f; }
+.btn-gold:not(:disabled) { background: #7a6018; color: #ffd873; }
+
+.btn-red { background: #3a1414; color: #d97a7a; border: 1px solid rgba(255,68,68,0.25); }
+.btn-red:not(:disabled) { background: #4d1717; color: #ff8f8f; }
+
+.btn-green { background: #10241a; color: #4d7a63; border: 1px solid rgba(38,218,114,0.15); }
+.btn-green:not(:disabled) { background: #104027; color: #26da72; }
+
+.btn-soft-red { background: rgba(220,60,60,0.1); border: 1px solid rgba(220,60,60,0.35); color: #ff8080; }
+.btn-soft-red:not(:disabled):hover { background: rgba(220,60,60,0.18); }
+
+.ban-row { display: flex; gap: 10px; margin-bottom: 12px; }
+.ban-row input { flex: 2; }
+.ban-row select { flex: 1; }
+
+.stack-gap { display: flex; flex-direction: column; gap: 10px; }
+
+.entry-list { margin-top: 14px; display: flex; flex-direction: column; gap: 8px; }
+.entry-list .empty-note { color: #5c6079; font-size: 12.5px; }
+.entry-row {
+  display: flex; align-items: center; justify-content: space-between;
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 8px; padding: 9px 12px; font-size: 13px;
+}
+.entry-row .entry-meta { color: #9096b3; }
+.entry-row button {
+  background: rgba(38,218,114,0.12); color: #26da72; border: 1px solid rgba(38,218,114,0.3);
+  border-radius: 6px; padding: 5px 10px; font-size: 12px; font-weight: bold; cursor: pointer;
+}
+.entry-row button:hover { background: rgba(38,218,114,0.2); }
+
+
+.checkbox-row { display: flex; align-items: center; gap: 10px; font-size: 14px; color: #ffd873; font-weight: bold; }
+.checkbox-row input { width: 16px; height: 16px; cursor: pointer; }
+
+.file-btn {
+  width: 100%; text-align: left; background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px; padding: 12px 14px; color: #7d829c; font-size: 14px; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+}
+.file-btn:hover { color: #a6abc4; }
+
+.publish-status { font-size: 12.5px; color: #26da72; margin-top: 8px; display: none; }
+
+
+.report-count { color: #ff6b6b; }
+.report-item {
+  background: rgba(255,255,255,0.025); border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 12px; padding: 16px; margin-top: 14px;
+}
+.report-item:first-of-type { margin-top: 0; }
+.report-top { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 6px; flex-wrap: wrap; gap: 6px; }
+.report-author { color: #ff6b6b; font-weight: 800; font-size: 14.5px; }
+.report-meta { color: #7d829c; font-size: 12px; font-style: italic; }
+.report-text { color: #e8e8f0; font-size: 14px; margin-bottom: 14px; }
+.report-actions { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.report-actions button {
+  border: none; border-radius: 8px; padding: 9px 6px; font-size: 12.5px; font-weight: bold; cursor: pointer;
+}
+.action-mute { background: rgba(217,154,60,0.15); color: #f5b95c; }
+.action-mute:hover { background: rgba(217,154,60,0.25); }
+.action-ban { background: rgba(220,60,60,0.15); color: #ff7a7a; }
+.action-ban:hover { background: rgba(220,60,60,0.25); }
+.action-ipban { background: rgba(139,92,246,0.18); color: #b794ff; }
+.action-ipban:hover { background: rgba(139,92,246,0.28); }
+.action-dismiss { background: rgba(255,255,255,0.06); color: #cfd0e0; }
+.action-dismiss:hover { background: rgba(255,255,255,0.1); }
+
+.no-reports { color: #5c6079; font-size: 13.5px; text-align: center; padding: 8px 0; }
+
+.mock-note {
+  font-size: 11.5px; color: #5c6079; text-align: center; margin-top: 6px;
+}
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DynaPuff:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style id="manglet-rehost-theme">
+:root {
+  --manglet-panel: #17191f;
+  --manglet-panel-2: #20232b;
+  --manglet-border: rgba(255,255,255,.09);
+  --manglet-text: #f4f5f7;
+  --manglet-muted: #9ba2b2;
+  --manglet-shadow: 0 14px 40px rgba(0,0,0,.22);
+  --manglet-radius: 18px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; scroll-behavior: smooth; }
+body {
+  background: var(--bg-color, #17100c) !important;
+  color: var(--manglet-text) !important;
+  font-family: 'Space Grotesk', Arial, sans-serif !important;
+  line-height: 1.5;
+}
+.sidebar {
+  width: 250px !important; background: var(--sidebar-color, #24160f) !important;
+  border-right: 1px solid rgba(255,255,255,.07);
+  padding: 22px 12px !important; box-shadow: 8px 0 30px rgba(0,0,0,.12);
+  overflow-y: auto; overflow-x: hidden;
+}
+.sidebar-logo {
+  font-family: 'DynaPuff','Space Grotesk',sans-serif !important;
+  font-size: 25px !important; letter-spacing: .5px !important;
+  color: #fff !important; padding: 0 12px 26px !important;
+}
+.sidebar-nav { gap: 5px; }
+.sidebar-nav a {
+  color: #c6cad4 !important; font: 600 13.5px 'Space Grotesk',sans-serif !important;
+  padding: 11px 13px !important; border-radius: 12px; margin: 0 2px;
+  gap: 11px !important; min-height: 42px; transition: background .18s, color .18s, transform .18s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: var(--sidebar-hover, #382216) !important; color: #fff !important;
+}
+.sidebar-nav a.active { box-shadow: inset 3px 0 0 var(--token-accent, #ff8c32); }
+.topbar { left: 250px !important; padding: 18px 24px !important; gap: 10px !important; }
+.token-display, .ruby-display {
+  border: 1px solid rgba(255,255,255,.12); border-radius: 13px !important;
+  padding: 8px 13px !important; box-shadow: 0 5px 16px rgba(0,0,0,.16);
+  font: 700 13px 'Space Grotesk',sans-serif !important;
+}
+.token-display { background: var(--token-accent, #ff8c32) !important; color: #fff !important; }
+.ruby-display { background: #a92d5b !important; color: #fff !important; }
+.main-content { margin-left: 250px !important; padding: 104px 28px 44px !important; min-width: 0; }
+.page-title, .owner-title, .profile-name, .section-title, .chat-panel-title, .picker-box h3, .title {
+  font-family: 'DynaPuff','Space Grotesk',sans-serif !important;
+  color: var(--manglet-text) !important; letter-spacing: -.3px;
+}
+.page-title { font-size: clamp(25px,3vw,34px) !important; }
+.page-subtitle, .owner-subtitle { color: var(--manglet-muted) !important; }
+.trade-wrap, .shop-wrap, .profile-wrap, .owner-wrap, .credits-wrap { max-width: 1240px; }
+.panel-card, .room-panel, .trade-list-card, .stat-card, .stat-tile, .shop-item-card,
+.shop-info-card, .collection-card, .clan-card, .profile-card, .card, .admin-row,
+.bazaar-card, .battle-card, .news-card, .leaderboard-card, .chat-panel,
+[class*="panel"], [class*="card"] {
+  border-color: var(--manglet-border);
+}
+.room-panel, .trade-list-card, .panel-card, .stat-card, .stat-tile, .shop-item-card,
+.shop-info-card, .collection-card, .clan-card, .profile-card, .card, .admin-row,
+.bazaar-card, .battle-card, .news-card, .leaderboard-card {
+  background: var(--manglet-panel) !important;
+  border-radius: var(--manglet-radius) !important;
+  box-shadow: var(--manglet-shadow);
+}
+input, textarea, select, .new-trade-row input, .chat-input-row input, .offer-tokens-row {
+  font-family: 'Space Grotesk',sans-serif !important;
+  border-radius: 12px !important;
+}
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+  background-color: var(--manglet-panel-2) !important;
+  color: var(--manglet-text) !important; border-color: var(--manglet-border) !important;
+}
+button, .button, .btn, .shop-buy-btn, .add-blook-btn, .list-tab-btn, .friends-tab-btn,
+.profile-action-btn, .wide-btn {
+  font-family: 'Space Grotesk',sans-serif !important; font-weight: 700 !important;
+  border-radius: 12px !important; transition: transform .16s, filter .16s, background .16s;
+}
+button:hover:not(:disabled), .button:hover, .btn:hover { filter: brightness(1.08); }
+button:active:not(:disabled) { transform: translateY(1px); }
+.list-tab-btn, .friends-tab-btn {
+  background: var(--manglet-panel) !important; border: 1px solid var(--manglet-border) !important;
+  color: var(--manglet-muted) !important;
+}
+.list-tab-btn.active, .friends-tab-btn.active {
+  background: var(--token-accent) !important; border-color: var(--token-accent) !important; color: #fff !important;
+}
+.room-back-btn { color: var(--manglet-muted) !important; }
+.room-footer { border-radius: 14px !important; }
+.offer-blook-icon, .picker-tile-icon, .room-avatar, .trade-list-avatar { border-radius: 13px !important; }
+.picker-box { background: var(--manglet-panel) !important; border: 1px solid var(--manglet-border) !important; border-radius: 20px !important; }
+.page-header-row { gap: 14px; }
+a { transition: color .16s, background .16s; }
+@media (max-width: 900px) {
+  .sidebar { width: 76px !important; padding: 18px 7px !important; }
+  .sidebar-logo { font-size: 0 !important; padding: 0 0 24px !important; text-align: center; }
+  .sidebar-logo::after { content: 'M'; font: 700 27px 'DynaPuff',sans-serif; color: var(--token-accent,#ff8c32); }
+  .sidebar-nav a { justify-content: center; padding: 12px 5px !important; gap: 0 !important; font-size: 0 !important; min-height: 44px; }
+  .sidebar-nav a .manglet-nav-icon { font-size: 21px !important; }
+  .topbar { left: 76px !important; padding: 13px 14px !important; }
+  .main-content { margin-left: 76px !important; padding: 86px 16px 32px !important; }
+}
+@media (max-width: 560px) {
+  .main-content { padding: 84px 12px 24px !important; }
+  .topbar { gap: 6px !important; }
+  .token-display, .ruby-display { padding: 6px 8px !important; font-size: 11px !important; }
+  .token-display img, .ruby-display img { width: 18px !important; height: 18px !important; }
+  .room-panel, .panel-card { padding: 15px !important; }
+  .room-footer button { padding: 14px 8px !important; font-size: 12px !important; }
+}
+</style>
+
+
+<style id="manglet-unified-navigation">
+:root{--bg-color:#17100c;--sidebar-color:#24160f;--sidebar-hover:#382216;--token-accent:#ff8c32;--panel:#1d2027;--panel2:#252933;--border:rgba(255,255,255,.09);--text:#f5f6fa;--muted:#a1a7b5}
+*{box-sizing:border-box}
+html{min-height:100%;scroll-behavior:smooth}
+body{margin:0!important;min-height:100vh;background:var(--bg-color)!important;color:var(--text,#f5f6fa)!important;font-family:'Space Grotesk',sans-serif!important}
+.sidebar{position:fixed!important;inset:0 auto 0 0!important;width:250px!important;background:var(--sidebar-color)!important;padding:22px 12px!important;border-right:1px solid var(--border)!important;box-shadow:8px 0 30px #0002;overflow-y:auto;overflow-x:hidden;z-index:20}
+.sidebar-logo{font:700 25px 'DynaPuff',sans-serif!important;color:var(--text,#f5f6fa)!important;padding:0 12px 26px!important;letter-spacing:0!important}
+.sidebar-nav{display:flex!important;flex-direction:column!important;gap:5px!important;flex:1}
+.sidebar-nav a{display:flex!important;align-items:center!important;gap:10px!important;text-decoration:none!important;color:#c6cad4!important;padding:11px 13px!important;border-radius:12px!important;font:600 13.5px 'Space Grotesk',sans-serif!important;transition:background .18s,color .18s,transform .18s}
+.sidebar-nav a:hover,.sidebar-nav a.active{background:var(--sidebar-hover)!important;color:#fff!important}
+.sidebar-nav a.active{box-shadow:inset 3px 0 var(--token-accent)!important}
+.sidebar-nav .material-icons{font-size:20px!important;line-height:1;flex:0 0 20px}
+.topbar{position:fixed!important;top:0!important;left:250px!important;right:0!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;padding:18px 24px!important;z-index:15!important;pointer-events:none}
+.token-display,.ruby-display{padding:8px 13px!important;border-radius:12px!important;background:var(--token-accent)!important;color:#fff!important;font-weight:700!important;margin-left:8px!important;box-shadow:0 6px 18px #0002}
+.ruby-display{background:#a92d5b!important}
+.token-display img,.ruby-display img{max-height:19px;max-width:19px;object-fit:contain;vertical-align:middle}
+.main-content{margin-left:250px!important;padding:100px 28px 44px!important;min-width:0}
+.page-title,.title,h1{font-family:'DynaPuff',sans-serif!important;color:var(--text,#f5f6fa)}
+.page-title,.title{font-size:clamp(27px,4vw,36px)!important;line-height:1.2;margin:8px 0 12px!important}
+.page-subtitle,.subtitle,.owner-subtitle{color:var(--muted,#a1a7b5)!important}
+.panel,.panel-card,.room-panel,.trade-list-card,.stat-card,.stat-tile,.shop-item-card,.shop-info-card,.credits-card,.settings-card,.content-card,.card{border-radius:18px!important;border:1px solid var(--border)!important;box-shadow:0 14px 40px #0003}
+button,.btn,input[type=button],input[type=submit]{border-radius:12px!important;font-family:'Space Grotesk',sans-serif!important}
+input,select,textarea{font-family:'Space Grotesk',sans-serif!important;border-radius:10px}
+a{transition:color .18s,background .18s}
+@media(max-width:900px){.sidebar{width:76px!important;padding:18px 7px!important}.sidebar-logo{font-size:0!important;text-align:center;padding:0 0 24px!important}.sidebar-logo:after{content:'M';font:700 27px 'DynaPuff',sans-serif;color:var(--token-accent)}.sidebar-nav a{justify-content:center!important;gap:0!important;font-size:0!important;padding:12px 5px!important}.sidebar-nav .material-icons{font-size:21px!important;flex:0 0 auto}.topbar{left:76px!important;padding:13px!important}.main-content{margin-left:76px!important;padding:86px 16px 32px!important}}
+@media(max-width:560px){.main-content{padding:84px 12px 24px!important}.panel,.panel-card,.room-panel,.trade-list-card,.stat-card,.stat-tile,.shop-item-card,.shop-info-card{padding:17px!important}.topbar{padding:10px!important}.token-display,.ruby-display{padding:7px 9px!important;font-size:12px}}
+</style>
+
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-logo">Manglet Rehost</div>
+<nav class="sidebar-nav">
+<a href="dashboard"><span class="material-icons">storefront</span>Market</a>
+<a href="chat"><span class="material-icons">forum</span>Global Chat</a>
+<a href="collection"><span class="material-icons">inventory_2</span>Collection</a>
+<a href="clans"><span class="material-icons">groups</span>Clans</a>
+<a href="news"><span class="material-icons">newspaper</span>News</a>
+<a href="trade"><span class="material-icons">swap_horiz</span>Trade</a>
+<a href="bazaar"><span class="material-icons">store</span>Bazaar</a>
+<a href="battle"><span class="material-icons">sports_esports</span>Battle Royale</a>
+<a href="leaderboard"><span class="material-icons">leaderboard</span>Leaderboard</a>
+<a href="rubyshop"><span class="material-icons">diamond</span>Ruby Shop</a>
+<a href="credits"><span class="material-icons">favorite</span>Credits</a>
+<a href="settings"><span class="material-icons">settings</span>Settings</a>
+<a href="profile"><span class="material-icons">person</span>Profile</a>
+<a href="admin" class="active"><span class="material-icons">admin_panel_settings</span>Admin Panel</a>
+</nav>
+</div>
+
+<div class="topbar">
+<div class="admin-badge">🛡️ ADMIN MODE</div>
+</div>
+
+<div class="main-content">
+<div class="admin-wrap">
+
+  <div class="admin-header">
+    <div class="admin-header-icon">🛡️</div>
+    <div>
+      <div class="admin-header-title">Admin Panel</div>
+      <div class="admin-header-subtitle">Admin controls</div>
+    </div>
+  </div>
+
+  
+  <div class="panel-card danger">
+    <div class="panel-title danger-text">🚩 Reported Messages (<span id="reportCount">0</span>)</div>
+    <div id="reportsList"></div>
+    <div id="noReportsNote" class="no-reports" style="display:none;">No reported messages. Nice and quiet in here.</div>
+  </div>
+
+  
+  <div class="panel-card">
+    <div class="target-label">Target Player</div>
+    <input type="text" id="targetPlayer" placeholder="Type username..." oninput="onTargetChange()">
+    <div id="targetStatus" style="margin-top:12px;"></div>
+  </div>
+
+  
+  <div class="panel-card">
+    <div class="panel-title">🎁 Give Blook</div>
+    <div class="give-row">
+      <select id="blookSelect"></select>
+      <button class="btn-give" id="giveBlookBtn" onclick="giveBlook()">Give</button>
+    </div>
+  </div>
+
+  
+  <div class="panel-card">
+    <div class="panel-title">✨ Give All Blooks</div>
+    <button class="wide-btn btn-gold" id="giveAllBtn" onclick="giveAllBlooks()">🏆 Give All Blooks to (select player)</button>
+  </div>
+
+  
+  <div class="panel-card danger">
+    <div class="panel-title danger-text">🚫 Ban Player</div>
+    <div class="ban-row">
+      <input type="number" id="banAmount" placeholder="Amount..." min="1" value="1">
+      <select id="banUnit">
+        <option value="Hours">Hours</option>
+        <option value="Days" selected>Days</option>
+        <option value="Weeks">Weeks</option>
+        <option value="Permanent">Permanent</option>
+      </select>
+    </div>
+    <div class="stack-gap">
+      <button class="wide-btn btn-red" id="banBtn" onclick="banPlayer()">🔨 Ban (select player)</button>
+      <button class="wide-btn btn-green" id="unbanBtn" onclick="unbanPlayer()">✅ Unban (select player)</button>
+    </div>
+  </div>
+
+  
+  <div class="panel-card danger">
+    <div class="panel-title danger-text">🌐 IP Ban</div>
+    <div class="panel-desc">Permanently bans the player and every network they've used. Nobody on those networks can sign up, log in, or chat. ⚠️ Schools and public Wi-Fi share one network — this blocks everyone there.</div>
+    <button class="wide-btn btn-soft-red" id="ipBanBtn" onclick="banIP()">Ban IP for (select player)</button>
+    <div class="entry-list" id="ipBanList"></div>
+  </div>
+
+  
+  <div class="panel-card danger">
+    <div class="panel-title danger-text">👥 Alt Accounts</div>
+    <div class="panel-desc">Accounts that have used the same network as the selected player. Shared networks (schools) can show real, different players — check before banning.</div>
+    <button class="wide-btn btn-soft-red" id="idBanBtn" onclick="findAlts()">Find alts of (select player)</button>
+    <div class="entry-list" id="altList"></div>
+    <div class="stack-gap" id="altActions" style="display:none; margin-top:10px;">
+      <button class="wide-btn btn-red" onclick="banAlts(false)">🔨 Ban all alts</button>
+      <button class="wide-btn btn-red" onclick="banAlts(true)">🔨 Ban alts + this player</button>
+    </div>
+  </div>
+
+  
+  <div class="panel-card">
+    <div class="panel-title">🚫 Banned Accounts</div>
+    <div class="entry-list" id="bannedAccountList"></div>
+  </div>
+
+  
+  <div class="panel-card">
+    <div class="panel-title">📰 Post News</div>
+    <div class="stack-gap">
+      <input type="text" id="newsTitle" placeholder="News title...">
+      <textarea id="newsBody" placeholder="Write your news post here..."></textarea>
+      <button type="button" class="file-btn" onclick="document.getElementById('newsImageInput').click()">
+        🖼️ <span id="newsImageLabel">Attach image (optional)</span>
+      </button>
+      <input type="file" id="newsImageInput" accept="image/*" style="display:none;" onchange="onNewsImageChosen(this)">
+      <label class="checkbox-row">
+        <input type="checkbox" id="newsPin"> 📌 Pin this post
+      </label>
+      <button class="wide-btn" style="background:#2f6fed; color:#fff;" onclick="publishNews()">📰 Publish News Post</button>
+      <div class="publish-status" id="publishStatus">Posted! (The public news feed page is coming later — this is saved and ready for it.)</div>
+    </div>
+  </div>
+
+  
+  <div class="panel-card">
+    <div class="panel-title">💎 Ruby Shop Items</div>
+    <div class="panel-desc">Add limited-time items purchasable with rubies. Deactivating an item pulls it from the live shop, but anyone who already bought it keeps it — items are never deleted.</div>
+    <div class="stack-gap">
+      <input type="text" id="rsName" placeholder="Item name (e.g. Firework Fox)">
+      <input type="text" id="rsImage" placeholder="Image path (e.g. blooks/Firework Fox.webp)">
+      <select id="rsRarity">
+        <option value="uncommon">Uncommon</option>
+        <option value="rare">Rare</option>
+        <option value="epic">Epic</option>
+        <option value="legendary" selected>Legendary</option>
+        <option value="chroma">Chroma</option>
+        <option value="mystical">Mystical</option>
+        <option value="supreme">Supreme</option>
+      </select>
+      <input type="number" id="rsCost" placeholder="Cost in rubies" min="1" value="10">
+      <label class="checkbox-row">
+        <input type="checkbox" id="rsHasExpiry" onchange="document.getElementById('rsExpiryRow').style.display = this.checked ? 'block' : 'none';"> Set an end date (limited time)
+      </label>
+      <div id="rsExpiryRow" style="display:none;">
+        <input type="datetime-local" id="rsExpiry">
+      </div>
+      <button class="wide-btn" style="background:#e0115f; color:#fff;" onclick="createRubyShopItem()">💎 Add to Ruby Shop</button>
+      <div class="publish-status" id="rsStatus" style="display:none;"></div>
+    </div>
+    <div class="entry-list" id="rsItemList" style="margin-top:16px;"></div>
+  </div>
+
+  <div class="mock-note">
+    Bans/mutes affect real accounts now. IPs and account IDs are still mocked (deterministically generated from the username) since there's no real network-level tracking yet.
+  </div>
+
+</div>
+</div>
+
+<script>
+
+const AUTH_TOKEN = localStorage.getItem('mangletSessionToken');
+if (!AUTH_TOKEN) {
+  location.href = "/login";
+}
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+
+
+
+
+function escapeForJsAttr(str) {
+  return String(str == null ? '' : str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+async function apiFetch(url, options = {}) {
+  const opts = Object.assign({}, options);
+  opts.headers = Object.assign(
+    { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + AUTH_TOKEN },
+    options.headers || {}
+  );
+  const res = await fetch(url, opts);
+  if (res.status === 401) {
+    localStorage.removeItem('mangletSessionToken');
+    location.href = "/login";
+    throw new Error('Not logged in');
+  }
+  return res;
+}
+
+
+const PACK_CONFIGS = {
+  spacePack: { label: "Space Pack", rates: [
+    { name: "Earth" }, { name: "Meteor" }, { name: "Stars" }, { name: "Alien" }, { name: "Planet" }, { name: "Spaceship" },
+    { name: "UFO" }, { name: "Astronaut" }, { name: "Space Terminal" }, { name: "Space Debugger" },
+    { name: "Pink Astronaut" }, { name: "Red Astronaut" }, { name: "Orange Astronaut" }, { name: "Yellow Astronaut" },
+    { name: "Lime Astronaut" }, { name: "Green Astronaut" }, { name: "Cyan Astronaut" }, { name: "Blue Astronaut" },
+    { name: "Purple Astronaut" }, { name: "Brown Astronaut" }, { name: "Black Astronaut" },
+    { name: "Tim the Alien" }, { name: "Rainbow Astronaut" }
+  ] },
+  medievalPack: { label: "Medieval Pack", rates: [
+    { name: "Elf" }, { name: "Fairy" }, { name: "Slime Monster" }, { name: "Witch" }, { name: "Wizard" },
+    { name: "Dragon" }, { name: "Jester" }, { name: "Queen" }, { name: "Unicorn" }, { name: "King" }, { name: "Phantom King" }
+  ] },
+  blizzardPack: { label: "Blizzard Pack", rates: [ { name: "Snowman" }, { name: "Penguin" }, { name: "Frost Giant" } ] },
+  cyberPack: { label: "Bot Pack", rates: [
+    { name: "Angry Bot" }, { name: "Happy Bot" }, { name: "Lil Bot" }, { name: "Lovely Bot" },
+    { name: "Buddy Bot" }, { name: "Watson" }, { name: "Brainy Bot" }, { name: "Mega Bot" }
+  ] },
+  breakfastpack: { label: "Breakfast Pack", rates: [
+    { name: "Toast" }, { name: "Cereal" }, { name: "Yogurt" }, { name: "Breakfast Combo" }, { name: "Orange Juice" },
+    { name: "Milk" }, { name: "Waffle" }, { name: "Pancakes" }, { name: "French Toast" }, { name: "Pizza" },
+    { name: "Chocolate Milk" }, { name: "Bacon and Eggs" }, { name: "Rainbow Waffles" }
+  ] },
+  outbackpack:   { label: "Outback Pack",   rates: [
+    { name: "Dingo" }, { name: "Echidna" }, { name: "Koala" }, { name: "Kookaburra" }, { name: "Platypus" },
+    { name: "Joey" }, { name: "Kangaroo" }, { name: "Crocodile" }, { name: "Sugar Glider" }, { name: "Teal Platypus" }
+  ] },
+  safariPack: { label: "Safari Pack", rates: [
+    { name: "Panda" }, { name: "Sloth" }, { name: "Tenrec" }, { name: "Flamingo" }, { name: "Zebra" },
+    { name: "Elephant" }, { name: "Lemur" }, { name: "Peacock" }, { name: "Chameleon" }, { name: "Lion" }, { name: "Rainbow Panda" }
+  ] },
+  bugPack: { label: "Bug Pack", rates: [
+    { name: "Ant" }, { name: "Rhino Beetle" }, { name: "Ladybug" }, { name: "Fly" },
+    { name: "Worm" }, { name: "Bee" }, { name: "Mantis" }, { name: "Butterfly" }, { name: "Blue Butterfly" }
+  ] },
+  iceMonstersPack: { label: "Ice Monsters Pack", rates: [
+    { name: "Ice Bat" }, { name: "Ice Bug" }, { name: "Ice Elemental" }, { name: "Rock Monster" },
+    { name: "Dink" }, { name: "Donk" }, { name: "Bush Monsters" }, { name: "Yeti" },
+    { name: "Ice Slime" }, { name: "Frozen Fossil" }, { name: "Ice Crab" }
+  ] },
+  aquaticPack: { label: "Aquatic Pack", rates: [
+    { name: "Old Boot" }, { name: "Clownfish" }, { name: "Crab" }, { name: "Frog" }, { name: "Jellyfish" },
+    { name: "Blobfish" }, { name: "Octopus" }, { name: "Pufferfish" }, { name: "Narwal" }, { name: "Dolphin" },
+    { name: "Baby Shark" }, { name: "Megalodon" }, { name: "Golden Blobfish" }
+  ] }
+};
+
+
+
+
+
+async function verifyAdmin() {
+  try {
+    const res = await apiFetch('/api/me');
+    const data = await res.json();
+    applyMangletTheme(data.user.theme);
+    showOwnerNav(data.user.isOwner);
+    if (!data.user.isAdmin) {
+      document.body.innerHTML = `
+        <div style="width:100%; text-align:center; padding:120px 20px; font-family:Arial, sans-serif; color:#7d829c;">
+          <div style="font-size:40px; margin-bottom:12px;">🔒</div>
+          <div style="font-size:18px; color:#e8e8f0; font-weight:bold; margin-bottom:8px;">Admins only</div>
+          <div>Your account (${escapeHtml(data.user.username)}) doesn't have admin access.</div>
+          <a href="dashboard" style="color:#2f6fed; font-weight:bold; display:inline-block; margin-top:16px;">&larr; Back to Market</a>
+        </div>
+      `;
+      return false;
+    }
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+function currentTarget() {
+  return document.getElementById('targetPlayer').value.trim();
+}
+
+let targetStatusDebounce = null;
+function onTargetChange() {
+  const name = currentTarget();
+  const label = name || 'select player';
+
+  document.getElementById('giveAllBtn').innerHTML = `🏆 Give All Blooks to (${escapeHtml(label)})`;
+  document.getElementById('banBtn').innerHTML = `🔨 Ban (${escapeHtml(label)})`;
+  document.getElementById('unbanBtn').innerHTML = `✅ Unban (${escapeHtml(label)})`;
+  document.getElementById('ipBanBtn').innerText = `Ban IP for (${label})`;
+  document.getElementById('idBanBtn').innerText = `Find alts of (${label})`;
+  document.getElementById('altList').innerHTML = '';
+  document.getElementById('altActions').style.display = 'none';
+
+  const disabled = !name;
+  ['giveBlookBtn','giveAllBtn','banBtn','unbanBtn','ipBanBtn','idBanBtn'].forEach(id => {
+    document.getElementById(id).disabled = disabled;
+  });
+
+  clearTimeout(targetStatusDebounce);
+  const statusEl = document.getElementById('targetStatus');
+  if (!name) { statusEl.innerHTML = ''; return; }
+  targetStatusDebounce = setTimeout(() => loadTargetStatus(name), 350);
+}
+
+async function loadTargetStatus(name) {
+  const statusEl = document.getElementById('targetStatus');
+  statusEl.innerHTML = '<div class="status-not-found">Checking...</div>';
+
+  const res = await apiFetch('/api/admin/user/' + encodeURIComponent(name));
+  if (currentTarget() !== name) return; 
+
+  if (!res.ok) {
+    statusEl.innerHTML = '<div class="status-not-found">No account found with that username.</div>';
+    return;
+  }
+  const data = await res.json();
+  const u = data.user;
+
+  const muteRow = `
+    <div class="status-row">
+      <span>Chat: <span class="status-pill ${u.muted ? 'status-bad' : 'status-ok'}">${u.muted ? 'MUTED' : 'Not muted'}</span></span>
+      ${u.muted ? `<button onclick="unmuteTarget('${escapeForJsAttr(u.username)}')">Unmute</button>` : ''}
+    </div>
+  `;
+  const banText = u.banned && u.banned.active
+    ? (u.banned.until ? `BANNED (until ${new Date(u.banned.until).toLocaleDateString()})` : 'BANNED (permanent)')
+    : 'Not banned';
+  const banRow = `
+    <div class="status-row">
+      <span>Account: <span class="status-pill ${u.banned && u.banned.active ? 'status-bad' : 'status-ok'}">${banText}</span></span>
+    </div>
+  `;
+  statusEl.innerHTML = muteRow + banRow;
+}
+
+async function unmuteTarget(username) {
+  const res = await apiFetch('/api/admin/unmute', { method: 'POST', body: JSON.stringify({ username }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  loadTargetStatus(username);
+}
+
+function populateBlookSelect() {
+  const select = document.getElementById('blookSelect');
+  select.innerHTML = '';
+  Object.entries(PACK_CONFIGS).forEach(([packKey, cfg]) => {
+    const group = document.createElement('optgroup');
+    group.label = cfg.label;
+    cfg.rates.forEach(b => {
+      const opt = document.createElement('option');
+      opt.value = packKey + '::' + b.name;
+      opt.innerText = b.name;
+      group.appendChild(opt);
+    });
+    select.appendChild(group);
+  });
+}
+
+async function giveBlook() {
+  const name = currentTarget();
+  if (!name) return;
+  const [packKey, blookName] = document.getElementById('blookSelect').value.split('::');
+
+  const res = await apiFetch('/api/admin/give-blook', {
+    method: 'POST',
+    body: JSON.stringify({ username: name, packKey, name: blookName })
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  flashGive(data.message);
+}
+
+async function giveAllBlooks() {
+  const name = currentTarget();
+  if (!name) return;
+
+  const res = await apiFetch('/api/admin/give-all', {
+    method: 'POST',
+    body: JSON.stringify({ username: name })
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  flashGive(data.message);
+}
+
+function flashGive(msg) {
+  const btn = document.getElementById('giveAllBtn');
+  btn.innerHTML = '✅ ' + msg;
+  setTimeout(() => { onTargetChange(); }, 1400);
+}
+
+async function banPlayer() {
+  const name = currentTarget();
+  if (!name) return;
+  const amount = parseInt(document.getElementById('banAmount').value, 10) || 1;
+  const unit = document.getElementById('banUnit').value;
+
+  const res = await apiFetch('/api/admin/ban', {
+    method: 'POST',
+    body: JSON.stringify({ username: name, amount, unit })
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  alert(data.message);
+}
+
+async function unbanPlayer() {
+  const name = currentTarget();
+  if (!name) return;
+
+  const res = await apiFetch('/api/admin/unban', {
+    method: 'POST',
+    body: JSON.stringify({ username: name })
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  alert(data.message);
+}
+
+async function banIP() {
+  const name = currentTarget();
+  if (!name) return;
+  if (!confirm(`Permanently ban ${name} and every network they've used?`)) return;
+
+  const res = await apiFetch('/api/admin/ip-ban', {
+    method: 'POST',
+    body: JSON.stringify({ username: name })
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  alert(data.message);
+  renderBans();
+}
+
+async function unbanIPEntry(username) {
+  await apiFetch('/api/admin/unban-ip', { method: 'POST', body: JSON.stringify({ username }) });
+  renderBans();
+}
+
+async function findAlts() {
+  const name = currentTarget();
+  if (!name) return;
+  const res = await apiFetch('/api/admin/alts/' + encodeURIComponent(name));
+  const data = await res.json();
+  const wrap = document.getElementById('altList');
+  if (!res.ok) { wrap.innerHTML = `<div class="empty-note">${escapeHtml(data.message)}</div>`; return; }
+  const unbanned = data.alts.filter(a => !a.banned && !a.isStaff);
+  wrap.innerHTML = data.alts.length === 0
+    ? `<div class="empty-note">No linked accounts (${data.ipCount} network${data.ipCount === 1 ? '' : 's'} on record).</div>`
+    : data.alts.map(a => `
+        <div class="entry-row">
+          <span>${escapeHtml(a.username)} <span class="entry-meta">— ${a.sharedIPs} shared network${a.sharedIPs === 1 ? '' : 's'}, ${Number(a.tokens || 0).toLocaleString('en-US')} coins${a.createdAt ? ', joined ' + new Date(a.createdAt).toLocaleDateString() : ''}${a.banned ? ' · BANNED' : ''}${a.isStaff ? ' · STAFF' : ''}</span></span>
+          <button onclick="selectTarget('${escapeForJsAttr(a.username)}')">Select</button>
+        </div>
+      `).join('');
+  document.getElementById('altActions').style.display = unbanned.length ? 'flex' : 'none';
+}
+
+function selectTarget(username) {
+  document.getElementById('targetPlayer').value = username;
+  onTargetChange();
+}
+
+async function banAlts(includeSelf) {
+  const name = currentTarget();
+  if (!name) return;
+  const what = includeSelf ? `${name} and all their alts` : `all alts of ${name}`;
+  if (!confirm(`Permanently ban ${what}?`)) return;
+  const res = await apiFetch('/api/admin/ban-alts', { method: 'POST', body: JSON.stringify({ username: name, includeSelf }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  alert(data.message + (data.banned.length ? '\n' + data.banned.join(', ') : ''));
+  findAlts();
+  renderBans();
+}
+
+async function unbanAccountEntry(username) {
+  const res = await apiFetch('/api/admin/unban', { method: 'POST', body: JSON.stringify({ username }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  renderBans();
+}
+
+async function renderBans() {
+  const res = await apiFetch('/api/admin/bans');
+  const data = await res.json();
+
+  const ipWrap = document.getElementById('ipBanList');
+  ipWrap.innerHTML = data.ips.length === 0
+    ? '<div class="empty-note">No IPs banned yet.</div>'
+    : data.ips.map(e => `
+        <div class="entry-row">
+          <span>${escapeHtml(e.player)} <span class="entry-meta">— ${e.count} network${e.count === 1 ? '' : 's'}, by ${escapeHtml(e.bannedBy || '?')}</span></span>
+          <button onclick="unbanIPEntry('${escapeForJsAttr(e.player)}')">Unban IPs</button>
+        </div>
+      `).join('');
+
+  const accWrap = document.getElementById('bannedAccountList');
+  accWrap.innerHTML = data.accounts.length === 0
+    ? '<div class="empty-note">No banned accounts.</div>'
+    : data.accounts.map(e => `
+        <div class="entry-row">
+          <span>${escapeHtml(e.player)} <span class="entry-meta">— ${e.until ? 'until ' + new Date(e.until).toLocaleString() : 'permanent'}</span></span>
+          <button onclick="unbanAccountEntry('${escapeForJsAttr(e.player)}')">Unban</button>
+        </div>
+      `).join('');
+}
+
+
+async function renderReports() {
+  const res = await apiFetch('/api/admin/reports');
+  const data = await res.json();
+  const reports = data.reports;
+
+  document.getElementById('reportCount').innerText = reports.length;
+  const list = document.getElementById('reportsList');
+  const noNote = document.getElementById('noReportsNote');
+
+  if (reports.length === 0) {
+    list.innerHTML = '';
+    noNote.style.display = 'block';
+    return;
+  }
+  noNote.style.display = 'none';
+
+  list.innerHTML = reports.map(r => `
+    <div class="report-item">
+      <div class="report-top">
+        <span class="report-author">${escapeHtml(r.author)}</span>
+        <span class="report-meta">reported by ${escapeHtml(r.reportedBy)}</span>
+      </div>
+      <div class="report-text">${escapeHtml(r.message)}</div>
+      <div class="report-actions">
+        <button class="action-mute" onclick="resolveReport(${r.id}, 'mute')">Mute User</button>
+        <button class="action-ban" onclick="resolveReport(${r.id}, 'ban')">Ban User</button>
+        <button class="action-ipban" onclick="resolveReport(${r.id}, 'ipban')">IP Ban</button>
+        <button class="action-dismiss" onclick="resolveReport(${r.id}, 'dismiss')">Dismiss</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function resolveReport(id, action) {
+  const res = await apiFetch(`/api/admin/reports/${id}/resolve`, {
+    method: 'POST',
+    body: JSON.stringify({ action })
+  });
+  if (!res.ok) { alert((await res.json()).message); return; }
+  renderReports();
+  if (action === 'ipban' || action === 'ban') renderBans();
+}
+
+
+let chosenImageName = null;
+function onNewsImageChosen(input) {
+  chosenImageName = input.files && input.files[0] ? input.files[0].name : null;
+  document.getElementById('newsImageLabel').innerText = chosenImageName || 'Attach image (optional)';
+}
+
+async function publishNews() {
+  const title = document.getElementById('newsTitle').value.trim();
+  const body = document.getElementById('newsBody').value.trim();
+  const pinned = document.getElementById('newsPin').checked;
+
+  if (!title || !body) {
+    alert('Add a title and some body text before publishing.');
+    return;
+  }
+
+  const res = await apiFetch('/api/admin/news', {
+    method: 'POST',
+    body: JSON.stringify({ title, body, image: chosenImageName, pinned })
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+
+  document.getElementById('newsTitle').value = '';
+  document.getElementById('newsBody').value = '';
+  document.getElementById('newsPin').checked = false;
+  chosenImageName = null;
+  document.getElementById('newsImageLabel').innerText = 'Attach image (optional)';
+  document.getElementById('newsImageInput').value = '';
+
+  const status = document.getElementById('publishStatus');
+  status.style.display = 'block';
+  setTimeout(() => { status.style.display = 'none'; }, 4000);
+}
+
+
+const RARITY_COLORS_ADMIN = { uncommon: "#2ecc71", rare: "#3b82f6", epic: "#a855f7", legendary: "#ff4444", chroma: "#ec4899", mystical: "#22d3ee", supreme: "#ffd700" };
+
+async function loadRubyShopItems() {
+  const res = await apiFetch('/api/admin/rubyshop/items');
+  const data = await res.json();
+  const list = document.getElementById('rsItemList');
+
+  if (data.items.length === 0) {
+    list.innerHTML = '<div class="no-reports">No Ruby Shop items yet — add one above.</div>';
+    return;
+  }
+
+  
+  const items = data.items.slice().reverse();
+  list.innerHTML = items.map(item => {
+    const color = RARITY_COLORS_ADMIN[item.rarity] || '#aaaaaa';
+    const expiryText = item.endsAt ? new Date(item.endsAt).toLocaleString() : 'No expiry';
+    return `
+      <div class="entry-row">
+        <span>
+          <b style="color:${color};">${escapeHtml(item.name)}</b>
+          <span class="entry-meta">— ${escapeHtml(item.rarity)} — 💎 ${item.cost} — ${item.active ? 'Active' : 'Inactive'} — ${escapeHtml(expiryText)}</span>
+        </span>
+        <button onclick="toggleRubyShopItem('${escapeForJsAttr(item.id)}')">${item.active ? 'Deactivate' : 'Reactivate'}</button>
+      </div>
+    `;
+  }).join('');
+}
+
+async function createRubyShopItem() {
+  const name = document.getElementById('rsName').value.trim();
+  const image = document.getElementById('rsImage').value.trim();
+  const rarity = document.getElementById('rsRarity').value;
+  const cost = parseInt(document.getElementById('rsCost').value, 10);
+  const hasExpiry = document.getElementById('rsHasExpiry').checked;
+  const expiryValue = document.getElementById('rsExpiry').value;
+
+  if (!name || !image || !cost) {
+    alert('Name, image path, and cost are all required.');
+    return;
+  }
+
+  const endsAt = hasExpiry && expiryValue ? new Date(expiryValue).getTime() : null;
+
+  const res = await apiFetch('/api/admin/rubyshop/items', {
+    method: 'POST',
+    body: JSON.stringify({ name, image, rarity, cost, endsAt })
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+
+  document.getElementById('rsName').value = '';
+  document.getElementById('rsImage').value = '';
+  document.getElementById('rsCost').value = '10';
+  document.getElementById('rsHasExpiry').checked = false;
+  document.getElementById('rsExpiry').value = '';
+  document.getElementById('rsExpiryRow').style.display = 'none';
+
+  const status = document.getElementById('rsStatus');
+  status.innerText = `Added "${data.item.name}" to the Ruby Shop!`;
+  status.style.display = 'block';
+  setTimeout(() => { status.style.display = 'none'; }, 4000);
+
+  await loadRubyShopItems();
+}
+
+async function toggleRubyShopItem(id) {
+  const res = await apiFetch(`/api/admin/rubyshop/items/${id}/toggle`, { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  await loadRubyShopItems();
+}
+
+
+(async function init() {
+  const ok = await verifyAdmin();
+  if (!ok) return;
+  populateBlookSelect();
+  onTargetChange();
+  renderBans();
+  renderReports();
+  await loadRubyShopItems();
+})();
+</script>
+
+
+<script id="manglet-rehost-nav-icons">
+(() => {
+  const iconMap = {
+    'Market':'storefront','Shop':'shopping-bag','Global Chat':'forum','Collection':'inventory_2',
+    'Clans':'groups','News':'newspaper','Trade':'swap_horiz','Bazaar':'store',
+    'Battle Royale':'sports_esports','Leaderboard':'leaderboard','Ruby Shop':'diamond',
+    'Credits':'favorite','Settings':'settings','Profile':'person','Admin Panel':'admin_panel_settings',
+    'Owner Panel':'verified_user'
+  };
+  document.querySelectorAll('.sidebar-nav a').forEach(a => {
+    const label = a.textContent.trim();
+    const icon = iconMap[label];
+    if (icon && !a.querySelector('.manglet-nav-icon')) {
+      const span = document.createElement('span');
+      span.className = 'material-icons manglet-nav-icon';
+      span.setAttribute('aria-hidden','true');
+      span.textContent = icon;
+      span.style.fontSize = '19px';
+      span.style.lineHeight = '1';
+      a.prepend(span);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

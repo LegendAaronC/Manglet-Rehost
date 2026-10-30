@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head> 
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Manglet Rehost</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700;800;900&family=DynaPuff:wght@700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<script>
+if (localStorage.getItem('mangletSessionToken')) {
+    window.location.href = 'dashboard';
+}
+</script>
+
+
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html, body { scrollbar-width: none; -ms-overflow-style: none; }
+::-webkit-scrollbar { display: none; }
+
+:root {
+    --bg:             #130600;
+    --bg-deep:        rgba(8, 2, 0, 0.88);
+    --surface:        rgba(255, 255, 255, 0.05);
+    --border:         rgba(255, 202, 40, 0.18);
+    --gold:           #ffca28;
+    --text:           #fff3dc;
+    --text-muted:     rgba(255, 243, 220, 0.55);
+    --btn-secondary-top: #FFE44D;
+    --btn-secondary-bot: #FF9500;
+    --btn-primary-top: #FFC928;
+    --btn-primary-bot: #FF7A18;
+    --btn-primary-secondary-txt: #2d0800;
+    --radius-card: 16px;
+    --radius-btn:  10px;
+}
+
+body {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 600;
+    color: var(--text);
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+}
+
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 900;
+    pointer-events: none;
+    opacity: 0.055;
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='250' height='250'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='250' height='250' filter='url(%23n)'/></svg>");
+    background-size: 250px 250px;
+}
+
+.bg-base-gradient {
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background:
+        radial-gradient(ellipse 80% 50% at 20% -5%, #c45200 0%, transparent 55%),
+        radial-gradient(ellipse 50% 40% at 85% 105%, #6b2200 0%, transparent 50%),
+        var(--bg);
+}
+
+.navbar {
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 40px;
+    background: var(--bg-deep);
+    border-bottom: 1px solid var(--border);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    position: sticky;
+    top: 0;
+    z-index: 200;
+}
+
+.logo {
+    font-family: 'DynaPuff', cursive;
+    font-size: 1.7rem;
+    font-weight: 700;
+    color: var(--text);
+}
+
+.nav-buttons { display: flex; gap: 8px; }
+
+.btn {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 800;
+    font-size: 0.875rem;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    padding: 9px 20px;
+    border-radius: var(--radius-btn);
+    letter-spacing: 0.1px;
+    transition: opacity 0.12s, transform 0.1s;
+}
+.btn:hover  { opacity: 0.85; transform: translateY(-1px); }
+.btn:active { opacity: 0.75; transform: translateY(0); }
+
+.primary {
+    background: linear-gradient(180deg, var(--btn-primary-top) 0%, var(--btn-primary-bot) 100%);
+    color: var(--btn-primary-secondary-txt);
+    box-shadow: 0 2px 0 #7a3a00;
+}
+
+.secondary {
+    background: linear-gradient(180deg, var(--btn-secondary-top) 0%, var(--btn-secondary-bot) 100%);
+    color: var(--btn-primary-secondary-txt);
+    border: 1px solid var(--border);
+}
+
+.github {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+}
+
+.hero {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 72px 24px 56px;
+    position: relative;
+    z-index: 5;
+}
+
+.hero h1 {
+    font-family: 'DynaPuff', cursive;
+    font-weight: 700;
+    font-size: clamp(3rem, 10vw, 10rem);
+    line-height: 1;
+    text-shadow: 0 3px 0 rgba(0, 0, 0, 0.2);
+    margin-bottom: 28px;
+}
+
+.hero-card {
+    max-width: 600px;
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    padding: 24px 28px;
+    backdrop-filter: blur(8px);
+}
+
+.hero-card p {
+    font-size: 1rem;
+    line-height: 1.7;
+    color: var(--text-muted);
+    max-width: 58ch;
+    margin: 0 auto;
+}
+
+.hero-buttons {
+    margin-top: 24px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.hero-buttons .btn {
+    padding: 12px 26px;
+    font-size: 0.925rem;
+}
+
+footer {
+    margin-top: auto;
+    padding: 20px 30px;
+    text-align: center;
+    background: var(--bg-deep);
+    border-top: 1px solid var(--border);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    position: relative;
+    z-index: 5;
+    backdrop-filter: blur(14px);
+}
+
+@media (max-width: 700px) {
+    .navbar {
+        height: auto;
+        flex-direction: column;
+        gap: 10px;
+        padding: 12px 16px 14px;
+    }
+
+    .logo { font-size: 1.5rem; }
+
+    .nav-buttons { width: 100%; justify-content: center; }
+
+    .nav-buttons .btn {
+        flex: 1;
+        max-width: 130px;
+        padding: 8px 10px;
+        font-size: 0.82rem;
+        text-align: center;
+    }
+
+    .hero { padding: 44px 16px 36px; }
+
+    .hero-card { padding: 18px 16px; }
+
+    .hero-buttons { flex-direction: column; gap: 8px; margin-top: 18px; }
+
+    .hero-buttons .btn { width: 100%; max-width: 280px; margin: 0 auto; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg-base-gradient"></div>
+
+<nav class="navbar">
+    <div class="logo">Manglet Rehost</div>
+    <div class="nav-buttons">
+        <a href="login" class="btn primary"><span>Login</span></a>
+        <a href="register" class="btn secondary"><span>Register</span></a>
+    </div>
+</nav>
+
+<section class="hero">
+    <h1>Manglet Rehost</h1>
+    <div class="hero-card">
+        <p>
+            Manglet Rehost is Manglet but hosted by Aaron. Most of the code on here is edited from the original Manglet.
+        </p>
+    </div>
+    <div class="hero-buttons">
+        <a href="login" class="btn primary"><span>Login</span></a>
+        <a href="register" class="btn secondary"><span>Register</span></a>
+    </div>
+    <a href="https://github.com/LegendAaronC/Manglet-Rehost" class="btn github" style="margin-top: 16px;"><span>View on GitHub</span></a>
+</section>
+
+
+
+<footer>
+ &copy; Manglet Rehost 2026
+</footer>
+</body>
+</html>

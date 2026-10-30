@@ -1,0 +1,20 @@
+{
+  "name": "manglet-server",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Minimal auth + global chat backend for Manglet",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^18.0.5",
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5",
+    "sqlite": "^5.1.1"
+  },
+  "engines": {
+    "node": ">=22.13"
+  }
+}

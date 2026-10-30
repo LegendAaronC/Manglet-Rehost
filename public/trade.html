@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js"></script>
+<title>Manglet Rehost | Trade</title>
+<link href="https://fonts.googleapis.com/css2?family=DynaPuff&display=swap" rel="stylesheet">
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'DynaPuff', Arial, sans-serif; }
+:root {
+  --bg-color: #ffe600;
+  --sidebar-color: #ffee00;
+  --sidebar-hover: #ffd000;
+  --token-accent: #ffc400;
+}
+body { background-color: var(--bg-color); min-height: 100vh; display: flex; }
+
+.sidebar { width: 250px; background: var(--sidebar-color); min-height: 100vh; display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; left: 0; z-index: 10; }
+.sidebar-logo { font-size: 28px; font-weight: 900; color: white; padding: 0 20px 24px 20px; letter-spacing: 2px; }
+.sidebar-nav { display: flex; flex-direction: column; flex: 1; }
+.sidebar-nav a { color: #ffffff; text-decoration: none; padding: 12px 20px; font-size: 16px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
+.sidebar-nav a:hover, .sidebar-nav a.active { background: var(--sidebar-hover); color: white; }
+
+.topbar { position: fixed; top: 0; left: 250px; right: 0; padding: 20px 24px; display: flex; justify-content: flex-end; align-items: center; gap: 12px; z-index: 10; }
+.token-display { display: flex; align-items: center; gap: 6px; background: var(--token-accent); color: white; padding: 6px 14px; border-radius: 8px; font-size: 16px; }
+.token-display img { width: 22px; height: 22px; border-radius: 4px; }
+.ruby-display { display: flex; align-items: center; gap: 6px; background: #e0115f; color: white; padding: 6px 14px; border-radius: 8px; font-size: 16px; }
+.ruby-display img { width: 22px; height: 22px; border-radius: 4px; }
+
+.main-content { margin-left: 250px; flex: 1; padding: 100px 24px 40px 24px; font-family: Arial, sans-serif; color: #e8e8f0; }
+.trade-wrap { max-width: 1200px; margin: 0 auto; }
+
+
+.page-header-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; flex-wrap: wrap; gap: 16px; }
+.page-title { font-family: 'DynaPuff', Arial, sans-serif; font-size: 28px; color: #17162b; }
+.page-subtitle { color: #6b6320; font-size: 13.5px; margin-top: 4px; }
+
+.new-trade-row { display: flex; gap: 10px; margin-bottom: 20px; }
+.new-trade-row input {
+  flex: 1; background: #14121f; border: 1px solid #22202f; border-radius: 10px;
+  padding: 12px 14px; color: #e8e8f0; font-size: 14px; outline: none; font-family: Arial, sans-serif;
+}
+.new-trade-row button {
+  background: linear-gradient(135deg, #7c5cff, #6a4bff); color: #fff; border: none; border-radius: 10px;
+  padding: 0 20px; font-weight: bold; font-size: 13.5px; cursor: pointer; white-space: nowrap;
+}
+.new-trade-row button:hover { filter: brightness(1.1); }
+
+.list-tab-row { display: flex; gap: 10px; margin-bottom: 16px; }
+.list-tab-btn {
+  background: #14121f; border: 1px solid #22202f; border-radius: 10px; padding: 9px 16px;
+  font-family: 'DynaPuff', Arial, sans-serif; font-size: 12.5px; color: #9096b3; cursor: pointer;
+}
+.list-tab-btn.active { background: #7c5cff; border-color: #7c5cff; color: #fff; }
+
+.trade-list { display: flex; flex-direction: column; gap: 10px; }
+.trade-list-card {
+  display: flex; align-items: center; gap: 14px; background: #14121f; border: 1px solid #22202f;
+  border-radius: 14px; padding: 14px 18px; cursor: pointer; transition: border-color 0.15s;
+}
+.trade-list-card:hover { border-color: rgba(124,92,255,0.4); }
+.trade-list-avatar { width: 42px; height: 42px; border-radius: 10px; background: #23233d; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.trade-list-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.trade-list-avatar-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(145deg, #ff9f43, #ff5e00); color: #fff; font-size: 16px; font-family: 'DynaPuff', Arial, sans-serif; }
+.trade-list-name { font-weight: bold; font-size: 14.5px; }
+.trade-list-meta { color: #7d829c; font-size: 12px; margin-top: 2px; }
+.trade-status-pill { margin-left: auto; font-size: 11px; font-weight: bold; padding: 4px 10px; border-radius: 20px; text-transform: uppercase; }
+.trade-status-pill.negotiating { background: rgba(59,111,237,0.15); color: #6ea0ff; }
+.trade-status-pill.accepted { background: rgba(38,218,114,0.15); color: #26da72; }
+.trade-status-pill.declined { background: rgba(220,60,60,0.15); color: #ff8080; }
+.list-empty-note { color: #6b6320; text-align: center; padding: 40px 0; font-size: 14px; }
+
+
+.room-back-btn {
+  background: none; border: none; color: #6b6320; font-family: Arial, sans-serif; font-weight: bold;
+  font-size: 13px; cursor: pointer; margin-bottom: 16px; display: flex; align-items: center; gap: 6px;
+}
+.room-grid { display: grid; grid-template-columns: 1fr 1.1fr 1fr; gap: 16px; }
+@media (max-width: 980px) { .room-grid { grid-template-columns: 1fr; } }
+
+.room-panel { background: #14121f; border: 1px solid #22202f; border-radius: 16px; padding: 20px; display: flex; flex-direction: column; min-height: 420px; }
+.room-panel-header { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
+.room-avatar { width: 38px; height: 38px; border-radius: 10px; background: #23233d; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
+.room-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.room-avatar-fallback { width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(145deg, #ff9f43, #ff5e00); color: #fff; font-size: 15px; font-family: 'DynaPuff', Arial, sans-serif; }
+.room-panel-name { font-weight: bold; font-size: 15px; }
+.online-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-left: 6px; }
+.online-dot.online { background: #26da72; box-shadow: 0 0 6px rgba(38,218,114,0.7); }
+.online-dot.offline { background: #565a75; }
+
+.offer-blooks-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(70px, 1fr)); gap: 10px; margin-bottom: 16px; flex: 1; align-content: start; }
+.offer-blook-tile { position: relative; text-align: center; }
+.offer-blook-icon { width: 60px; height: 60px; border-radius: 12px; background: #23233d; border: 1px solid rgba(255,255,255,0.08); display: flex; align-items: center; justify-content: center; overflow: hidden; margin: 0 auto; }
+.offer-blook-icon img { width: 75%; height: 75%; object-fit: contain; }
+.offer-blook-qty { position: absolute; top: -6px; right: 2px; background: #2f6fed; color: #fff; font-size: 10px; font-weight: bold; border-radius: 20px; padding: 2px 6px; border: 2px solid #14121f; }
+.offer-blook-remove {
+  position: absolute; inset: 0; background: rgba(220,60,60,0.85); border-radius: 12px; color: #fff; font-size: 11px;
+  font-weight: bold; display: none; align-items: center; justify-content: center; cursor: pointer; font-family: Arial, sans-serif;
+}
+.offer-blook-tile.mine:hover .offer-blook-remove { display: flex; }
+.offer-empty-note { color: #565a75; font-size: 12.5px; text-align: center; padding: 30px 10px; grid-column: 1 / -1; }
+
+.offer-tokens-row { display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px; padding: 10px 14px; margin-bottom: 12px; }
+.offer-tokens-row input {
+  flex: 1; background: transparent; border: none; outline: none; color: #ffcf4d; font-size: 15px;
+  font-weight: bold; font-family: 'DynaPuff', Arial, sans-serif;
+}
+.offer-tokens-row .readonly-tokens { color: #ffcf4d; font-size: 15px; font-weight: bold; font-family: 'DynaPuff', Arial, sans-serif; }
+
+.add-blook-btn {
+  width: 100%; background: rgba(124,92,255,0.1); border: 1px dashed rgba(124,92,255,0.4); color: #a68cff;
+  border-radius: 10px; padding: 11px; font-weight: bold; font-size: 13px; cursor: pointer; font-family: Arial, sans-serif;
+}
+.add-blook-btn:hover { background: rgba(124,92,255,0.16); }
+
+
+.chat-panel { display: flex; flex-direction: column; }
+.chat-panel-title { font-family: 'DynaPuff', Arial, sans-serif; font-size: 15px; color: #fff; margin-bottom: 16px; }
+.chat-msg-list { flex: 1; display: flex; flex-direction: column; gap: 12px; overflow-y: auto; margin-bottom: 14px; max-height: 320px; }
+.chat-msg-row { display: flex; gap: 10px; }
+.chat-msg-avatar { width: 30px; height: 30px; border-radius: 8px; background: #23233d; overflow: hidden; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; }
+.chat-msg-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.chat-msg-author { font-weight: bold; font-size: 12.5px; color: #cfd0e0; }
+.chat-msg-text { font-size: 13px; color: #9096b3; margin-top: 2px; word-break: break-word; }
+.chat-empty-note { color: #565a75; font-size: 12.5px; text-align: center; margin: auto; }
+.chat-input-row { display: flex; gap: 8px; }
+.chat-input-row input {
+  flex: 1; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09); border-radius: 10px;
+  padding: 11px 14px; color: #e8e8f0; font-size: 13.5px; outline: none; font-family: Arial, sans-serif;
+}
+.chat-send-btn { background: #7c5cff; border: none; border-radius: 10px; width: 42px; color: #fff; cursor: pointer; font-size: 15px; }
+.chat-send-btn:hover { filter: brightness(1.1); }
+
+
+.room-footer { display: flex; gap: 0; margin-top: 16px; border-radius: 14px; overflow: hidden; }
+.room-footer button { flex: 1; border: none; padding: 18px; font-family: 'DynaPuff', Arial, sans-serif; font-size: 15px; cursor: pointer; }
+.btn-decline-trade { background: #dc2626; color: #fff; }
+.btn-decline-trade:hover { filter: brightness(1.1); }
+.btn-accept-trade { background: #26da72; color: #0a1f12; }
+.btn-accept-trade:hover { filter: brightness(1.1); }
+.btn-accept-trade:disabled { opacity: 0.6; cursor: default; filter: none; }
+.confirm-note { text-align: center; margin-top: 10px; font-size: 13px; color: #26da72; }
+.room-footer button:disabled { opacity: 0.5; cursor: not-allowed; }
+.room-status-banner { text-align: center; padding: 14px; border-radius: 14px; margin-top: 16px; font-family: 'DynaPuff', Arial, sans-serif; font-size: 14px; }
+.room-status-banner.accepted { background: rgba(38,218,114,0.12); color: #26da72; border: 1px solid rgba(38,218,114,0.3); }
+.room-status-banner.declined { background: rgba(220,60,60,0.12); color: #ff8080; border: 1px solid rgba(220,60,60,0.3); }
+
+
+.picker-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.75); backdrop-filter: blur(4px);
+  display: flex; justify-content: center; align-items: center; z-index: 250;
+  opacity: 0; pointer-events: none; transition: opacity 0.2s;
+}
+.picker-overlay.active { opacity: 1; pointer-events: auto; }
+.picker-box {
+  width: 92%; max-width: 420px; max-height: 80vh; background: #14101f; border: 1px solid rgba(150,120,255,0.25);
+  border-radius: 18px; padding: 24px; font-family: Arial, sans-serif; color: #e8e8f0;
+}
+.picker-box h3 { font-family: 'DynaPuff', Arial, sans-serif; font-size: 16px; color: #fff; margin-bottom: 14px; }
+.picker-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-height: 320px; overflow-y: auto; margin-bottom: 14px; }
+.picker-tile { cursor: pointer; text-align: center; padding: 8px 4px; border-radius: 10px; border: 2px solid transparent; }
+.picker-tile:hover { background: rgba(255,255,255,0.05); }
+.picker-tile-icon { width: 50px; height: 50px; margin: 0 auto 4px auto; border-radius: 10px; background: #23233d; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.picker-tile-icon img { width: 75%; height: 75%; object-fit: contain; }
+.picker-tile-name { font-size: 9px; color: #9096b3; }
+.picker-cancel-btn { width: 100%; background: transparent; border: none; color: #7d829c; padding: 6px; cursor: pointer; }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DynaPuff:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style id="manglet-rehost-theme">
+:root {
+  --manglet-panel: #17191f;
+  --manglet-panel-2: #20232b;
+  --manglet-border: rgba(255,255,255,.09);
+  --manglet-text: #f4f5f7;
+  --manglet-muted: #9ba2b2;
+  --manglet-shadow: 0 14px 40px rgba(0,0,0,.22);
+  --manglet-radius: 18px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; scroll-behavior: smooth; }
+body {
+  background: var(--bg-color, #17100c) !important;
+  color: var(--manglet-text) !important;
+  font-family: 'Space Grotesk', Arial, sans-serif !important;
+  line-height: 1.5;
+}
+.sidebar {
+  width: 250px !important; background: var(--sidebar-color, #24160f) !important;
+  border-right: 1px solid rgba(255,255,255,.07);
+  padding: 22px 12px !important; box-shadow: 8px 0 30px rgba(0,0,0,.12);
+  overflow-y: auto; overflow-x: hidden;
+}
+.sidebar-logo {
+  font-family: 'DynaPuff','Space Grotesk',sans-serif !important;
+  font-size: 25px !important; letter-spacing: .5px !important;
+  color: #fff !important; padding: 0 12px 26px !important;
+}
+.sidebar-nav { gap: 5px; }
+.sidebar-nav a {
+  color: #c6cad4 !important; font: 600 13.5px 'Space Grotesk',sans-serif !important;
+  padding: 11px 13px !important; border-radius: 12px; margin: 0 2px;
+  gap: 11px !important; min-height: 42px; transition: background .18s, color .18s, transform .18s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: var(--sidebar-hover, #382216) !important; color: #fff !important;
+}
+.sidebar-nav a.active { box-shadow: inset 3px 0 0 var(--token-accent, #ff8c32); }
+.topbar { left: 250px !important; padding: 18px 24px !important; gap: 10px !important; }
+.token-display, .ruby-display {
+  border: 1px solid rgba(255,255,255,.12); border-radius: 13px !important;
+  padding: 8px 13px !important; box-shadow: 0 5px 16px rgba(0,0,0,.16);
+  font: 700 13px 'Space Grotesk',sans-serif !important;
+}
+.token-display { background: var(--token-accent, #ff8c32) !important; color: #fff !important; }
+.ruby-display { background: #a92d5b !important; color: #fff !important; }
+.main-content { margin-left: 250px !important; padding: 104px 28px 44px !important; min-width: 0; }
+.page-title, .owner-title, .profile-name, .section-title, .chat-panel-title, .picker-box h3, .title {
+  font-family: 'DynaPuff','Space Grotesk',sans-serif !important;
+  color: var(--manglet-text) !important; letter-spacing: -.3px;
+}
+.page-title { font-size: clamp(25px,3vw,34px) !important; }
+.page-subtitle, .owner-subtitle { color: var(--manglet-muted) !important; }
+.trade-wrap, .shop-wrap, .profile-wrap, .owner-wrap, .credits-wrap { max-width: 1240px; }
+.panel-card, .room-panel, .trade-list-card, .stat-card, .stat-tile, .shop-item-card,
+.shop-info-card, .collection-card, .clan-card, .profile-card, .card, .admin-row,
+.bazaar-card, .battle-card, .news-card, .leaderboard-card, .chat-panel,
+[class*="panel"], [class*="card"] {
+  border-color: var(--manglet-border);
+}
+.room-panel, .trade-list-card, .panel-card, .stat-card, .stat-tile, .shop-item-card,
+.shop-info-card, .collection-card, .clan-card, .profile-card, .card, .admin-row,
+.bazaar-card, .battle-card, .news-card, .leaderboard-card {
+  background: var(--manglet-panel) !important;
+  border-radius: var(--manglet-radius) !important;
+  box-shadow: var(--manglet-shadow);
+}
+input, textarea, select, .new-trade-row input, .chat-input-row input, .offer-tokens-row {
+  font-family: 'Space Grotesk',sans-serif !important;
+  border-radius: 12px !important;
+}
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+  background-color: var(--manglet-panel-2) !important;
+  color: var(--manglet-text) !important; border-color: var(--manglet-border) !important;
+}
+button, .button, .btn, .shop-buy-btn, .add-blook-btn, .list-tab-btn, .friends-tab-btn,
+.profile-action-btn, .wide-btn {
+  font-family: 'Space Grotesk',sans-serif !important; font-weight: 700 !important;
+  border-radius: 12px !important; transition: transform .16s, filter .16s, background .16s;
+}
+button:hover:not(:disabled), .button:hover, .btn:hover { filter: brightness(1.08); }
+button:active:not(:disabled) { transform: translateY(1px); }
+.list-tab-btn, .friends-tab-btn {
+  background: var(--manglet-panel) !important; border: 1px solid var(--manglet-border) !important;
+  color: var(--manglet-muted) !important;
+}
+.list-tab-btn.active, .friends-tab-btn.active {
+  background: var(--token-accent) !important; border-color: var(--token-accent) !important; color: #fff !important;
+}
+.room-back-btn { color: var(--manglet-muted) !important; }
+.room-footer { border-radius: 14px !important; }
+.offer-blook-icon, .picker-tile-icon, .room-avatar, .trade-list-avatar { border-radius: 13px !important; }
+.picker-box { background: var(--manglet-panel) !important; border: 1px solid var(--manglet-border) !important; border-radius: 20px !important; }
+.page-header-row { gap: 14px; }
+a { transition: color .16s, background .16s; }
+@media (max-width: 900px) {
+  .sidebar { width: 76px !important; padding: 18px 7px !important; }
+  .sidebar-logo { font-size: 0 !important; padding: 0 0 24px !important; text-align: center; }
+  .sidebar-logo::after { content: 'M'; font: 700 27px 'DynaPuff',sans-serif; color: var(--token-accent,#ff8c32); }
+  .sidebar-nav a { justify-content: center; padding: 12px 5px !important; gap: 0 !important; font-size: 0 !important; min-height: 44px; }
+  .sidebar-nav a .manglet-nav-icon { font-size: 21px !important; }
+  .topbar { left: 76px !important; padding: 13px 14px !important; }
+  .main-content { margin-left: 76px !important; padding: 86px 16px 32px !important; }
+}
+@media (max-width: 560px) {
+  .main-content { padding: 84px 12px 24px !important; }
+  .topbar { gap: 6px !important; }
+  .token-display, .ruby-display { padding: 6px 8px !important; font-size: 11px !important; }
+  .token-display img, .ruby-display img { width: 18px !important; height: 18px !important; }
+  .room-panel, .panel-card { padding: 15px !important; }
+  .room-footer button { padding: 14px 8px !important; font-size: 12px !important; }
+}
+</style>
+
+
+<style id="manglet-unified-navigation">
+:root{--bg-color:#17100c;--sidebar-color:#24160f;--sidebar-hover:#382216;--token-accent:#ff8c32;--panel:#1d2027;--panel2:#252933;--border:rgba(255,255,255,.09);--text:#f5f6fa;--muted:#a1a7b5}
+*{box-sizing:border-box}
+html{min-height:100%;scroll-behavior:smooth}
+body{margin:0!important;min-height:100vh;background:var(--bg-color)!important;color:var(--text,#f5f6fa)!important;font-family:'Space Grotesk',sans-serif!important}
+.sidebar{position:fixed!important;inset:0 auto 0 0!important;width:250px!important;background:var(--sidebar-color)!important;padding:22px 12px!important;border-right:1px solid var(--border)!important;box-shadow:8px 0 30px #0002;overflow-y:auto;overflow-x:hidden;z-index:20}
+.sidebar-logo{font:700 25px 'DynaPuff',sans-serif!important;color:var(--text,#f5f6fa)!important;padding:0 12px 26px!important;letter-spacing:0!important}
+.sidebar-nav{display:flex!important;flex-direction:column!important;gap:5px!important;flex:1}
+.sidebar-nav a{display:flex!important;align-items:center!important;gap:10px!important;text-decoration:none!important;color:#c6cad4!important;padding:11px 13px!important;border-radius:12px!important;font:600 13.5px 'Space Grotesk',sans-serif!important;transition:background .18s,color .18s,transform .18s}
+.sidebar-nav a:hover,.sidebar-nav a.active{background:var(--sidebar-hover)!important;color:#fff!important}
+.sidebar-nav a.active{box-shadow:inset 3px 0 var(--token-accent)!important}
+.sidebar-nav .material-icons{font-size:20px!important;line-height:1;flex:0 0 20px}
+.topbar{position:fixed!important;top:0!important;left:250px!important;right:0!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;padding:18px 24px!important;z-index:15!important;pointer-events:none}
+.token-display,.ruby-display{padding:8px 13px!important;border-radius:12px!important;background:var(--token-accent)!important;color:#fff!important;font-weight:700!important;margin-left:8px!important;box-shadow:0 6px 18px #0002}
+.ruby-display{background:#a92d5b!important}
+.token-display img,.ruby-display img{max-height:19px;max-width:19px;object-fit:contain;vertical-align:middle}
+.main-content{margin-left:250px!important;padding:100px 28px 44px!important;min-width:0}
+.page-title,.title,h1{font-family:'DynaPuff',sans-serif!important;color:var(--text,#f5f6fa)}
+.page-title,.title{font-size:clamp(27px,4vw,36px)!important;line-height:1.2;margin:8px 0 12px!important}
+.page-subtitle,.subtitle,.owner-subtitle{color:var(--muted,#a1a7b5)!important}
+.panel,.panel-card,.room-panel,.trade-list-card,.stat-card,.stat-tile,.shop-item-card,.shop-info-card,.credits-card,.settings-card,.content-card,.card{border-radius:18px!important;border:1px solid var(--border)!important;box-shadow:0 14px 40px #0003}
+button,.btn,input[type=button],input[type=submit]{border-radius:12px!important;font-family:'Space Grotesk',sans-serif!important}
+input,select,textarea{font-family:'Space Grotesk',sans-serif!important;border-radius:10px}
+a{transition:color .18s,background .18s}
+@media(max-width:900px){.sidebar{width:76px!important;padding:18px 7px!important}.sidebar-logo{font-size:0!important;text-align:center;padding:0 0 24px!important}.sidebar-logo:after{content:'M';font:700 27px 'DynaPuff',sans-serif;color:var(--token-accent)}.sidebar-nav a{justify-content:center!important;gap:0!important;font-size:0!important;padding:12px 5px!important}.sidebar-nav .material-icons{font-size:21px!important;flex:0 0 auto}.topbar{left:76px!important;padding:13px!important}.main-content{margin-left:76px!important;padding:86px 16px 32px!important}}
+@media(max-width:560px){.main-content{padding:84px 12px 24px!important}.panel,.panel-card,.room-panel,.trade-list-card,.stat-card,.stat-tile,.shop-item-card,.shop-info-card{padding:17px!important}.topbar{padding:10px!important}.token-display,.ruby-display{padding:7px 9px!important;font-size:12px}}
+</style>
+
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-logo">Manglet Rehost</div>
+<nav class="sidebar-nav">
+<a href="dashboard"><span class="material-icons">storefront</span>Market</a>
+<a href="chat"><span class="material-icons">forum</span>Global Chat</a>
+<a href="collection"><span class="material-icons">inventory_2</span>Collection</a>
+<a href="clans"><span class="material-icons">groups</span>Clans</a>
+<a href="news"><span class="material-icons">newspaper</span>News</a>
+<a href="trade" class="active"><span class="material-icons">swap_horiz</span>Trade</a>
+<a href="bazaar"><span class="material-icons">store</span>Bazaar</a>
+<a href="battle"><span class="material-icons">sports_esports</span>Battle Royale</a>
+<a href="leaderboard"><span class="material-icons">leaderboard</span>Leaderboard</a>
+<a href="rubyshop"><span class="material-icons">diamond</span>Ruby Shop</a>
+<a href="credits"><span class="material-icons">favorite</span>Credits</a>
+<a href="settings"><span class="material-icons">settings</span>Settings</a>
+<a href="profile"><span class="material-icons">person</span>Profile</a>
+</nav>
+</div>
+
+<div class="topbar">
+<div class="token-display">
+<img src="coin.png" alt="coin" onerror="this.style.display='none'">
+<span id="tokenBalance">0</span>
+</div>
+<div class="ruby-display">
+<img src="ruby.png" alt="ruby" onerror="this.style.display='none'">
+<span id="rubyBalance">0</span>
+</div>
+</div>
+
+<div class="main-content">
+<div class="trade-wrap">
+
+  
+  <div id="listView">
+    <div class="page-header-row">
+      <div>
+        <div class="page-title">Trade</div>
+        <div class="page-subtitle">Live, real-time trading — both sides edit their own offer.</div>
+      </div>
+    </div>
+
+    <div class="new-trade-row">
+      <input type="text" id="newTradeInput" placeholder="Start a trade with username..." onkeydown="if(event.key==='Enter') startNewTrade()">
+      <button onclick="startNewTrade()">Start Trade</button>
+    </div>
+
+    <div class="list-tab-row">
+      <button class="list-tab-btn active" id="activeTabBtn" onclick="switchListTab('active')">Active</button>
+      <button class="list-tab-btn" id="historyTabBtn" onclick="switchListTab('history')">History</button>
+    </div>
+
+    <div class="trade-list" id="tradeList"></div>
+  </div>
+
+  
+  <div id="roomView" style="display:none;">
+    <button class="room-back-btn" onclick="closeRoom()">← Back to Trades</button>
+
+    <div class="room-grid">
+      
+      <div class="room-panel">
+        <div class="room-panel-header">
+          <div class="room-avatar" id="myAvatar"></div>
+          <div class="room-panel-name" id="myNameLabel">You</div>
+        </div>
+        <div class="offer-blooks-grid" id="myBlooksGrid"></div>
+        <div class="offer-tokens-row">
+          <img src="coin.png" style="width:18px;height:18px;" onerror="this.style.display='none'">
+          <input type="number" id="myTokensInput" placeholder="0" min="0" onchange="handleMyTokensChange()">
+        </div>
+        <button class="add-blook-btn" onclick="openTradePicker()">+ Add Blook</button>
+      </div>
+
+      
+      <div class="room-panel chat-panel">
+        <div class="chat-panel-title">Trade Chat</div>
+        <div class="chat-msg-list" id="chatMsgList"><div class="chat-empty-note">No messages yet.</div></div>
+        <div class="chat-input-row">
+          <input type="text" id="tradeChatInput" placeholder="Message..." onkeydown="if(event.key==='Enter') sendRoomChat()">
+          <button class="chat-send-btn" onclick="sendRoomChat()">➤</button>
+        </div>
+      </div>
+
+      
+      <div class="room-panel">
+        <div class="room-panel-header">
+          <div class="room-avatar" id="theirAvatar"></div>
+          <div class="room-panel-name" id="theirNameLabel">Them</div>
+          <span class="online-dot offline" id="theirOnlineDot"></span>
+        </div>
+        <div class="offer-blooks-grid" id="theirBlooksGrid"></div>
+        <div class="offer-tokens-row">
+          <img src="coin.png" style="width:18px;height:18px;" onerror="this.style.display='none'">
+          <span class="readonly-tokens" id="theirTokensLabel">0</span>
+        </div>
+      </div>
+    </div>
+
+    <div id="roomFooterActive" class="room-footer">
+      <button class="btn-decline-trade" onclick="declineRoomTrade()">Decline Trade</button>
+      <button class="btn-accept-trade" id="acceptTradeBtn" onclick="acceptRoomTrade()">Accept Trade</button>
+    </div>
+    <div id="confirmNote" class="confirm-note" style="display:none;"></div>
+    <div id="roomStatusBanner" style="display:none;"></div>
+  </div>
+
+</div>
+</div>
+
+
+<div id="tradePickerOverlay" class="picker-overlay" onclick="if(event.target===this) closeTradePicker()">
+  <div class="picker-box">
+    <h3>Add a Blook to Your Offer</h3>
+    <div class="picker-grid" id="tradePickerGrid"></div>
+    <button class="picker-cancel-btn" onclick="closeTradePicker()">Cancel</button>
+  </div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+const AUTH_TOKEN = localStorage.getItem('mangletSessionToken');
+if (!AUTH_TOKEN) { location.href = "/login"; }
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+
+
+
+
+function escapeForJsAttr(str) {
+  return String(str == null ? '' : str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+async function apiFetch(url, options = {}) {
+  const opts = Object.assign({}, options);
+  opts.headers = Object.assign(
+    { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + AUTH_TOKEN },
+    options.headers || {}
+  );
+  const res = await fetch(url, opts);
+  if (res.status === 401) {
+    localStorage.removeItem('mangletSessionToken');
+    location.href = "/login";
+    throw new Error('Not logged in');
+  }
+  return res;
+}
+function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+
+const socket = io({ auth: { token: AUTH_TOKEN } });
+socket.on('rubyEarned', (data) => {
+  const el = document.getElementById('rubyBalance');
+  if (el) el.innerText = fmt(data.rubies);
+});
+let myUsername = ''; 
+let me = null;
+let currentListTab = 'active';
+let currentRoom = null; 
+let myCollection = {};
+
+
+const PACK_CONFIGS_CLIENT = {
+  spacePack: { rates: [
+    { name: "Earth", item: "blooks/Earth.webp" }, { name: "Meteor", item: "blooks/Meteor.webp" },
+    { name: "Stars", item: "blooks/Stars.webp" }, { name: "Alien", item: "blooks/Alien.webp" },
+    { name: "Planet", item: "blooks/Planet.webp" }, { name: "Spaceship", item: "blooks/Spaceship.webp" },
+    { name: "UFO", item: "blooks/UFO.webp" }, { name: "Astronaut", item: "blooks/Astronaut.webp" },
+    { name: "Space Terminal", item: "blooks/Space Terminal.webp" }, { name: "Space Debugger", item: "blooks/Space Debugger.webp" },
+    { name: "Pink Astronaut", item: "blooks/Pink Astronaut.webp" }, { name: "Red Astronaut", item: "blooks/Red Astronaut.webp" },
+    { name: "Orange Astronaut", item: "blooks/Orange Astronaut.webp" }, { name: "Yellow Astronaut", item: "blooks/Yellow Astronaut.webp" },
+    { name: "Lime Astronaut", item: "blooks/Lime Astronaut.webp" }, { name: "Green Astronaut", item: "blooks/Green Astronaut.webp" },
+    { name: "Cyan Astronaut", item: "blooks/Cyan Astronaut.webp" }, { name: "Blue Astronaut", item: "blooks/Blue Astronaut.webp" },
+    { name: "Purple Astronaut", item: "blooks/Purple Astronaut.webp" }, { name: "Brown Astronaut", item: "blooks/Brown Astronaut.webp" },
+    { name: "Black Astronaut", item: "blooks/Black Astronaut.webp" }, { name: "Tim the Alien", item: "blooks/Tim The Alien.webp" },
+    { name: "Rainbow Astronaut", item: "blooks/Rainbow Astronaut.webp" }
+  ] },
+  medievalPack: { rates: [
+    { name: "Elf", item: "blooks/Elf.webp" }, { name: "Fairy", item: "blooks/Fairy.webp" }, { name: "Slime Monster", item: "blooks/Slime Monster.webp" },
+    { name: "Witch", item: "blooks/Witch.webp" }, { name: "Wizard", item: "blooks/Wizard.webp" }, { name: "Dragon", item: "blooks/Dragon.webp" },
+    { name: "Jester", item: "blooks/Jester.webp" }, { name: "Queen", item: "blooks/Queen.webp" }, { name: "Unicorn", item: "blooks/Unicorn.webp" },
+    { name: "King", item: "blooks/King.webp" }, { name: "Phantom King", item: "blooks/Phantom King.webp" }
+  ] },
+  blizzardPack: { rates: [ { name: "Snowman", item: "snowman.png" }, { name: "Penguin", item: "penguin.png" }, { name: "Frost Giant", item: "frostgiant.png" } ] },
+  cyberPack: { rates: [
+    { name: "Angry Bot", item: "blooks/Angry Bot.webp" }, { name: "Happy Bot", item: "blooks/Happy Bot.webp" },
+    { name: "Lil Bot", item: "blooks/Lil Bot.webp" }, { name: "Lovely Bot", item: "blooks/Lovely Bot.webp" },
+    { name: "Buddy Bot", item: "blooks/Buddy Bot.webp" }, { name: "Watson", item: "blooks/Watson.webp" },
+    { name: "Brainy Bot", item: "blooks/Brainy Bot.webp" }, { name: "Mega Bot", item: "blooks/Mega Bot.webp" }
+  ] },
+  breakfastpack: { rates: [
+    { name: "Toast", item: "blooks/Toast.webp" }, { name: "Cereal", item: "blooks/Cereal.webp" }, { name: "Yogurt", item: "blooks/Yogurt.webp" },
+    { name: "Breakfast Combo", item: "blooks/Breakfast Combo.webp" }, { name: "Orange Juice", item: "blooks/Orange Juice.webp" }, { name: "Milk", item: "blooks/Milk.webp" },
+    { name: "Waffle", item: "blooks/Waffle.webp" }, { name: "Pancakes", item: "blooks/Pancakes.webp" },
+    { name: "French Toast", item: "blooks/French Toast.webp" }, { name: "Pizza", item: "blooks/Pizza.webp" },
+    { name: "Chocolate Milk", item: "blooks/Chocolate Milk.webp" }, { name: "Bacon and Eggs", item: "blooks/Bacon and Eggs.webp" },
+    { name: "Rainbow Waffles", item: "blooks/Rainbow Waffles.webp" }
+  ] },
+  outbackpack: { rates: [
+    { name: "Dingo", item: "blooks/Dingo.webp" }, { name: "Echidna", item: "blooks/Echidna.webp" }, { name: "Koala", item: "blooks/Koala.webp" },
+    { name: "Kookaburra", item: "blooks/Kookaburra.webp" }, { name: "Platypus", item: "blooks/Platypus.webp" }, { name: "Joey", item: "blooks/Joey.webp" },
+    { name: "Kangaroo", item: "blooks/Kangaroo.webp" }, { name: "Crocodile", item: "blooks/Crocodile.webp" },
+    { name: "Sugar Glider", item: "blooks/SugarGlider.webp" }, { name: "Teal Platypus", item: "blooks/TealPlatypus.webp" }
+  ] },
+  safariPack: { rates: [
+    { name: "Panda", item: "blooks/Panda.webp" }, { name: "Sloth", item: "blooks/Sloth.webp" }, { name: "Tenrec", item: "blooks/Tenrec.webp" },
+    { name: "Flamingo", item: "blooks/Flamingo.webp" }, { name: "Zebra", item: "blooks/Zebra.webp" }, { name: "Elephant", item: "blooks/Elephant.webp" },
+    { name: "Lemur", item: "blooks/Lemur.webp" }, { name: "Peacock", item: "blooks/Peacock.webp" }, { name: "Chameleon", item: "blooks/Chameleon.webp" },
+    { name: "Lion", item: "blooks/Lion.webp" }, { name: "Rainbow Panda", item: "blooks/Rainbow Panda.webp" }
+  ] },
+  bugPack: { rates: [
+    { name: "Ant", item: "blooks/Ant.webp" }, { name: "Rhino Beetle", item: "blooks/Rhino Beetle.webp" },
+    { name: "Ladybug", item: "blooks/Ladybug.webp" }, { name: "Fly", item: "blooks/Fly.webp" },
+    { name: "Worm", item: "blooks/Worm.webp" }, { name: "Bee", item: "blooks/Bee.webp" },
+    { name: "Mantis", item: "blooks/Mantis.webp" }, { name: "Butterfly", item: "blooks/Butterfly.webp" },
+    { name: "Blue Butterfly", item: "blooks/Blue Butterfly.webp" }
+  ] },
+  iceMonstersPack: { rates: [
+    { name: "Ice Bat", item: "blooks/Ice Bat.webp" }, { name: "Ice Bug", item: "blooks/Ice Bug.webp" },
+    { name: "Ice Elemental", item: "blooks/Ice Elemental.webp" }, { name: "Rock Monster", item: "blooks/Rock Monster.webp" },
+    { name: "Dink", item: "blooks/Dink.webp" }, { name: "Donk", item: "blooks/Donk.webp" },
+    { name: "Bush Monsters", item: "blooks/Bush Monsters.webp" }, { name: "Yeti", item: "blooks/Yeti.webp" },
+    { name: "Ice Slime", item: "blooks/Ice Slime.webp" }, { name: "Frozen Fossil", item: "blooks/Frozen Fossil.webp" },
+    { name: "Ice Crab", item: "blooks/Ice Crab.webp" }
+  ] },
+  aquaticPack: { rates: [
+    { name: "Old Boot", item: "blooks/Old Boot.webp" }, { name: "Clownfish", item: "blooks/Clownfish.webp" },
+    { name: "Crab", item: "blooks/Crab.webp" }, { name: "Frog", item: "blooks/Frog.webp" },
+    { name: "Jellyfish", item: "blooks/Jellyfish.webp" }, { name: "Blobfish", item: "blooks/Blobfish.webp" },
+    { name: "Octopus", item: "blooks/Octopus.webp" }, { name: "Pufferfish", item: "blooks/Pufferfish.webp" },
+    { name: "Narwal", item: "blooks/Narwal.webp" }, { name: "Dolphin", item: "blooks/Dolphin.webp" },
+    { name: "Baby Shark", item: "blooks/Baby Shark.webp" }, { name: "Megalodon", item: "blooks/Megalodon.webp" },
+    { name: "Golden Blobfish", item: "blooks/Golden Blobfish.webp" }
+  ] }
+};
+
+async function loadMe() {
+  const res = await apiFetch('/api/me');
+  const data = await res.json();
+  me = data.user;
+  myUsername = me.username; 
+  myCollection = me.collection || {};
+  document.getElementById('tokenBalance').innerText = fmt(me.tokens);
+  const rubyEl = document.getElementById('rubyBalance');
+  if (rubyEl) rubyEl.innerText = fmt(me.rubies || 0);
+  applyMangletTheme(me.theme);
+  showOwnerNav(me.isOwner);
+  socket.emit('registerUser', myUsername);
+}
+
+function switchListTab(tab) {
+  currentListTab = tab;
+  document.getElementById('activeTabBtn').classList.toggle('active', tab === 'active');
+  document.getElementById('historyTabBtn').classList.toggle('active', tab === 'history');
+  loadTradeList();
+}
+
+function avatarHtml(avatar, username, cls, fallbackCls) {
+  const initial = escapeHtml((username || '?').charAt(0).toUpperCase());
+  if (avatar) {
+    return `<img src="${escapeHtml(avatar)}" alt="" onerror="this.parentElement.innerHTML='<div class=${fallbackCls}>${initial}</div>';">`;
+  }
+  return `<div class="${fallbackCls}">${initial}</div>`;
+}
+
+async function loadTradeList() {
+  const res = await apiFetch('/api/trades?type=' + currentListTab);
+  const data = await res.json();
+  const list = document.getElementById('tradeList');
+
+  if (data.trades.length === 0) {
+    list.innerHTML = `<div class="list-empty-note">${currentListTab === 'active' ? "No active trades — start one above!" : "No trade history yet."}</div>`;
+    return;
+  }
+
+  list.innerHTML = data.trades.map(t => `
+    <div class="trade-list-card" onclick="openRoomById('${escapeForJsAttr(t.id)}')">
+      <div class="trade-list-avatar">${avatarHtml(null, t.otherUsername, '', 'trade-list-avatar-fallback')}</div>
+      <div>
+        <div class="trade-list-name">${escapeHtml(t.otherUsername)}</div>
+        <div class="trade-list-meta">${new Date(t.updatedAt).toLocaleString()}</div>
+      </div>
+      <span class="trade-status-pill ${t.status}">${t.status}</span>
+    </div>
+  `).join('');
+}
+
+async function startNewTrade() {
+  const input = document.getElementById('newTradeInput');
+  const username = input.value.trim();
+  if (!username) return;
+
+  const res = await apiFetch('/api/trades', { method: 'POST', body: JSON.stringify({ toUsername: username }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  input.value = '';
+  openRoom(data.trade);
+}
+
+async function openRoomById(tradeId) {
+  const res = await apiFetch('/api/trades/' + tradeId);
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  openRoom(data.trade);
+}
+
+
+
+
+async function openRoom(trade) {
+  currentRoom = trade;
+  document.getElementById('listView').style.display = 'none';
+  document.getElementById('roomView').style.display = 'block';
+  renderRoom();
+  await loadRoomChat();
+}
+
+function closeRoom() {
+  currentRoom = null;
+  document.getElementById('roomView').style.display = 'none';
+  document.getElementById('listView').style.display = 'block';
+  loadTradeList();
+}
+
+function renderRoom() {
+  if (!currentRoom) return;
+  const t = currentRoom;
+  const mySide = t.sides[t.myKey];
+  const otherKey = t.myKey === t.fromKey ? t.toKey : t.fromKey;
+  const theirSide = t.sides[otherKey];
+
+  document.getElementById('myNameLabel').innerText = myUsername;
+  document.getElementById('myAvatar').innerHTML = avatarHtml(me ? me.avatar : null, myUsername, '', 'room-avatar-fallback');
+  document.getElementById('theirNameLabel').innerText = t.otherUsername;
+  document.getElementById('theirAvatar').innerHTML = avatarHtml(null, t.otherUsername, '', 'room-avatar-fallback');
+  document.getElementById('theirOnlineDot').className = 'online-dot ' + (t.otherOnline ? 'online' : 'offline');
+
+  renderOfferGrid('myBlooksGrid', mySide.blooks, true);
+  renderOfferGrid('theirBlooksGrid', theirSide.blooks, false);
+
+  const tokensInput = document.getElementById('myTokensInput');
+  if (document.activeElement !== tokensInput) tokensInput.value = mySide.tokens || '';
+  document.getElementById('theirTokensLabel').innerText = fmt(theirSide.tokens);
+
+  const footer = document.getElementById('roomFooterActive');
+  const banner = document.getElementById('roomStatusBanner');
+  const acceptBtn = document.getElementById('acceptTradeBtn');
+  const confirmNote = document.getElementById('confirmNote');
+  if (t.status === 'negotiating') {
+    footer.style.display = 'flex';
+    banner.style.display = 'none';
+    
+    acceptBtn.disabled = t.myConfirmed;
+    acceptBtn.innerText = t.myConfirmed ? 'Accepted ✓' : 'Accept Trade';
+    const notes = [];
+    if (t.otherConfirmed) notes.push(`${t.otherUsername} accepted this offer.`);
+    if (t.myConfirmed) notes.push(`Waiting for ${t.otherUsername} to accept.`);
+    confirmNote.innerText = notes.join(' ');
+    confirmNote.style.display = notes.length ? 'block' : 'none';
+  } else {
+    confirmNote.style.display = 'none';
+    footer.style.display = 'none';
+    banner.style.display = 'block';
+    banner.className = 'room-status-banner ' + t.status;
+    banner.innerText = t.status === 'accepted' ? '✅ Trade completed!' : '❌ Trade declined.';
+  }
+}
+
+function renderOfferGrid(elId, blooks, mine) {
+  const grid = document.getElementById(elId);
+  if (blooks.length === 0) {
+    grid.innerHTML = '<div class="offer-empty-note">No blooks added</div>';
+    return;
+  }
+  grid.innerHTML = blooks.map(b => `
+    <div class="offer-blook-tile ${mine ? 'mine' : ''}">
+      <div class="offer-blook-icon"><img src="${b.image}" onerror="this.style.display='none'"></div>
+      ${b.qty > 1 ? `<span class="offer-blook-qty">${b.qty}</span>` : ''}
+      ${mine ? `<div class="offer-blook-remove" onclick="removeFromMyOffer('${b.packKey}', ${JSON.stringify(b.name)})">Remove</div>` : ''}
+    </div>
+  `).join('');
+}
+
+
+
+
+function myOfferAsRequestBlooks() {
+  const mySide = currentRoom.sides[currentRoom.myKey];
+  return mySide.blooks.map(b => ({ packKey: b.packKey, name: b.name, qty: b.qty }));
+}
+
+async function submitMyOffer(tokens, blooksList) {
+  const res = await apiFetch(`/api/trades/${currentRoom.id}/offer`, {
+    method: 'POST',
+    body: JSON.stringify({ tokens, blooks: blooksList })
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); renderRoom(); return; } 
+  currentRoom = data.trade;
+  renderRoom();
+}
+
+function handleMyTokensChange() {
+  const val = Math.max(0, parseInt(document.getElementById('myTokensInput').value, 10) || 0);
+  submitMyOffer(val, myOfferAsRequestBlooks());
+}
+
+function removeFromMyOffer(packKey, name) {
+  const blooks = myOfferAsRequestBlooks().filter(b => !(b.packKey === packKey && b.name === name));
+  const mySide = currentRoom.sides[currentRoom.myKey];
+  submitMyOffer(mySide.tokens, blooks);
+}
+
+
+
+
+let pickerRows = [];
+function openTradePicker() {
+  const grid = document.getElementById('tradePickerGrid');
+  pickerRows = [];
+  Object.entries(PACK_CONFIGS_CLIENT).forEach(([packKey, cfg]) => {
+    cfg.rates.forEach(b => {
+      if ((myCollection[packKey + '::' + b.name] || 0) > 0) pickerRows.push({ packKey, name: b.name, item: b.item });
+    });
+  });
+  if (pickerRows.length === 0) {
+    grid.innerHTML = '<div style="grid-column:1/-1; color:#565a75; text-align:center; padding:20px 0; font-size:13px;">You don\'t own any blooks yet.</div>';
+  } else {
+    grid.innerHTML = pickerRows.map((b, i) => `
+      <div class="picker-tile" onclick="pickTradeBlook(${i})">
+        <div class="picker-tile-icon"><img src="${b.item}" onerror="this.style.display='none'"></div>
+        <div class="picker-tile-name">${b.name}</div>
+      </div>
+    `).join('');
+  }
+  document.getElementById('tradePickerOverlay').classList.add('active');
+}
+function closeTradePicker() {
+  document.getElementById('tradePickerOverlay').classList.remove('active');
+}
+function pickTradeBlook(index) {
+  const picked = pickerRows[index];
+  const blooks = myOfferAsRequestBlooks();
+  const existing = blooks.find(b => b.packKey === picked.packKey && b.name === picked.name);
+  if (existing) existing.qty += 1;
+  else blooks.push({ packKey: picked.packKey, name: picked.name, qty: 1 });
+
+  const mySide = currentRoom.sides[currentRoom.myKey];
+  closeTradePicker();
+  submitMyOffer(mySide.tokens, blooks);
+}
+
+
+
+
+async function acceptRoomTrade() {
+  const res = await apiFetch(`/api/trades/${currentRoom.id}/accept`, { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  currentRoom = data.trade;
+  renderRoom();
+  await loadMe(); 
+}
+async function declineRoomTrade() {
+  if (!confirm('Decline and close this trade?')) return;
+  const res = await apiFetch(`/api/trades/${currentRoom.id}/decline`, { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  currentRoom = data.trade;
+  renderRoom();
+}
+
+
+
+
+function chatMsgHtml(msg) {
+  const initial = escapeHtml(msg.author.charAt(0).toUpperCase());
+  return `
+    <div class="chat-msg-row">
+      <div class="chat-msg-avatar">${initial}</div>
+      <div>
+        <div class="chat-msg-author">${escapeHtml(msg.author)}</div>
+        <div class="chat-msg-text">${escapeHtml(msg.text)}</div>
+      </div>
+    </div>
+  `;
+}
+
+async function loadRoomChat() {
+  const res = await apiFetch(`/api/trades/${currentRoom.id}/chat`);
+  const data = await res.json();
+  const box = document.getElementById('chatMsgList');
+  box.innerHTML = data.messages.length === 0
+    ? '<div class="chat-empty-note">No messages yet.</div>'
+    : data.messages.map(chatMsgHtml).join('');
+  box.scrollTop = box.scrollHeight;
+}
+
+function sendRoomChat() {
+  const input = document.getElementById('tradeChatInput');
+  const text = input.value.trim();
+  if (!text || !currentRoom) return;
+  socket.emit('tradeChatMessage', { tradeId: currentRoom.id, text });
+  input.value = '';
+}
+
+socket.on('tradeChatMessage', (payload) => {
+  if (!currentRoom || payload.tradeId !== currentRoom.id) return;
+  const box = document.getElementById('chatMsgList');
+  if (box.querySelector('.chat-empty-note')) box.innerHTML = '';
+  box.insertAdjacentHTML('beforeend', chatMsgHtml(payload.message));
+  box.scrollTop = box.scrollHeight;
+});
+
+
+
+
+socket.on('tradeUpdate', (payload) => {
+  if (currentRoom && payload.tradeId === currentRoom.id) {
+    currentRoom = payload.trade;
+    renderRoom();
+  }
+  
+  if (document.getElementById('listView').style.display !== 'none') {
+    loadTradeList();
+  }
+});
+
+async function init() {
+  await loadMe();
+  await loadTradeList();
+}
+init();
+</script>
+
+
+<script id="manglet-rehost-nav-icons">
+(() => {
+  const iconMap = {
+    'Market':'storefront','Shop':'shopping-bag','Global Chat':'forum','Collection':'inventory_2',
+    'Clans':'groups','News':'newspaper','Trade':'swap_horiz','Bazaar':'store',
+    'Battle Royale':'sports_esports','Leaderboard':'leaderboard','Ruby Shop':'diamond',
+    'Credits':'favorite','Settings':'settings','Profile':'person','Admin Panel':'admin_panel_settings',
+    'Owner Panel':'verified_user'
+  };
+  document.querySelectorAll('.sidebar-nav a').forEach(a => {
+    const label = a.textContent.trim();
+    const icon = iconMap[label];
+    if (icon && !a.querySelector('.manglet-nav-icon')) {
+      const span = document.createElement('span');
+      span.className = 'material-icons manglet-nav-icon';
+      span.setAttribute('aria-hidden','true');
+      span.textContent = icon;
+      span.style.fontSize = '19px';
+      span.style.lineHeight = '1';
+      a.prepend(span);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="theme.js"></script>
+<title>Manglet Rehost | Clans</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; font-family: 'DynaPuff', Arial, sans-serif; }
+:root { --bg-color: #ffe600; --sidebar-color: #ffee00; --sidebar-hover: #ffd000; --token-accent: #ffc400; }
+body { background-color: var(--bg-color); min-height: 100vh; display: flex; }
+
+
+.sidebar { width: 250px; background: var(--sidebar-color); min-height: 100vh; display: flex; flex-direction: column; padding: 20px 0; position: fixed; top: 0; left: 0; z-index: 10; }
+.sidebar-logo { font-size: 28px; font-weight: 900; color: white; padding: 0 20px 24px 20px; letter-spacing: 2px; }
+.sidebar-nav { display: flex; flex-direction: column; flex: 1; }
+.sidebar-nav a { color: #ffffff; text-decoration: none; padding: 12px 20px; font-size: 16px; display: flex; align-items: center; gap: 10px; transition: background 0.2s; }
+.sidebar-nav a:hover, .sidebar-nav a.active { background: var(--sidebar-hover); color: white; }
+
+
+.topbar { position: fixed; top: 0; left: 250px; right: 0; padding: 20px 24px; display: flex; justify-content: flex-end; align-items: center; gap: 12px; z-index: 10; }
+.token-display { display: flex; align-items: center; gap: 6px; background: var(--token-accent); color: white; padding: 6px 14px; border-radius: 8px; font-size: 16px; }
+.token-display img { width: 22px; height: 22px; border-radius: 4px; }
+.ruby-display { display: flex; align-items: center; gap: 6px; background: #e0115f; color: white; padding: 6px 14px; border-radius: 8px; font-size: 16px; }
+.ruby-display img { width: 22px; height: 22px; border-radius: 4px; }
+
+.main-content { margin-left: 250px; flex: 1; display: flex; justify-content: center; padding: 100px 20px 60px 20px; }
+
+
+.clans-wrap { width: 100%; max-width: 980px; font-family: Arial, sans-serif; color: #e8e8f0; }
+
+.clans-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+.clans-title-block { display: flex; align-items: center; gap: 10px; }
+.clans-title-icon { font-size: 26px; }
+.clans-title { font-family: 'DynaPuff', Arial, sans-serif; font-size: 28px; color: #17162b; }
+.clans-subtitle { color: #6b6320; font-size: 13.5px; margin-top: 2px; }
+.leave-btn {
+  background: rgba(220,60,60,0.9); color: #fff; border: none; border-radius: 10px;
+  padding: 10px 18px; font-weight: bold; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; gap: 6px;
+}
+.leave-btn:hover { background: rgba(220,60,60,1); }
+
+.tab-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 20px; }
+.tab-btn {
+  background: #1a1a2e; color: #9096b3; border: 1px solid #262238; border-radius: 10px;
+  padding: 10px 16px; font-size: 13.5px; font-weight: bold; cursor: pointer; font-family: 'DynaPuff', Arial, sans-serif;
+}
+.tab-btn.active { background: #2f6fed; color: #fff; border-color: #2f6fed; }
+.tab-btn:hover:not(.active) { background: #201f38; color: #cfd0e0; }
+
+.panel-card { background: #14121f; border: 1px solid #262238; border-radius: 16px; padding: 24px; margin-bottom: 16px; }
+.panel-card h3 { display: flex; align-items: center; gap: 8px; font-size: 16px; margin-bottom: 6px; color: #fff; }
+.panel-desc { color: #7d829c; font-size: 13px; margin-bottom: 16px; line-height: 1.5; }
+
+
+.no-clan-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+.no-clan-card { flex: 1; min-width: 240px; }
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%; background: rgba(255,255,255,0.045); border: 1px solid rgba(255,255,255,0.09);
+  border-radius: 10px; padding: 12px 14px; color: #e8e8f0; font-size: 14px; outline: none; font-family: Arial, sans-serif;
+}
+textarea { resize: vertical; min-height: 60px; }
+.field-gap { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+.primary-btn {
+  background: #2f6fed; color: #fff; border: none; border-radius: 10px; padding: 12px; width: 100%;
+  font-weight: bold; font-size: 14px; cursor: pointer;
+}
+.primary-btn:hover { background: #3f7dfa; }
+.primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.checkbox-row { display: flex; align-items: center; gap: 8px; font-size: 13.5px; color: #cfd0e0; margin-bottom: 4px; }
+
+
+.clan-id-card { display: flex; align-items: center; gap: 16px; }
+.clan-icon-box {
+  width: 64px; height: 64px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  font-family: 'DynaPuff', Arial, sans-serif; font-size: 26px; color: #fff; flex-shrink: 0; overflow: hidden;
+}
+.clan-name-line { font-family: 'DynaPuff', Arial, sans-serif; font-size: 19px; }
+.clan-meta-line { color: #7d829c; font-size: 13px; margin-top: 4px; }
+
+.color-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.color-tile {
+  background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 10px;
+  padding: 14px; display: flex; justify-content: space-between; align-items: flex-start; cursor: pointer;
+}
+.color-tile.active-tile { border-color: #3b82f6; }
+.color-name { font-weight: 800; font-size: 14px; margin-bottom: 4px; }
+.color-sub { color: #7d829c; font-size: 12px; }
+.pill { font-size: 10.5px; font-weight: 800; padding: 3px 8px; border-radius: 6px; }
+.pill.owned { background: rgba(38,218,114,0.15); color: #26da72; }
+.pill.active-pill { background: rgba(59,130,246,0.2); color: #3b82f6; }
+.pill.buy { background: rgba(255,255,255,0.08); color: #cfd0e0; }
+
+
+.member-row {
+  display: flex; align-items: center; justify-content: space-between; padding: 12px 4px;
+  border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 14px;
+}
+.member-row:last-child { border-bottom: none; }
+.member-left { display: flex; align-items: center; gap: 8px; font-weight: bold; }
+.role-icon { font-size: 14px; }
+.role-tag { color: #7d829c; font-size: 12px; font-weight: normal; margin-left: 4px; }
+.member-actions { display: flex; gap: 6px; }
+.member-actions button {
+  background: rgba(255,255,255,0.06); border: none; border-radius: 6px; padding: 5px 10px;
+  color: #cfd0e0; font-size: 11.5px; font-weight: bold; cursor: pointer;
+}
+.member-actions button.kick { background: rgba(220,60,60,0.15); color: #ff8080; }
+.member-actions button:hover { filter: brightness(1.2); }
+
+
+.clan-chat-box { height: 420px; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding-right: 4px; }
+.clan-chat-msg { display: flex; gap: 10px; align-items: flex-start; }
+.clan-chat-avatar {
+  width: 32px; height: 32px; border-radius: 8px; background: #3a2e5c; display: flex; align-items: center;
+  justify-content: center; font-weight: bold; font-size: 12px; color: #fff; flex-shrink: 0;
+}
+.clan-chat-meta { font-size: 12.5px; }
+.clan-chat-author { font-weight: bold; color: #cfd0e0; }
+.clan-chat-time { color: #565a75; margin-left: 6px; }
+.clan-chat-text { font-size: 13.5px; color: #e8e8f0; margin-top: 2px; }
+.clan-chat-form { display: flex; gap: 10px; margin-top: 16px; }
+.clan-chat-form input { flex: 1; }
+.clan-send-btn { background: #2f6fed; border: none; border-radius: 10px; width: 44px; color: #fff; font-size: 16px; cursor: pointer; }
+
+
+.bank-progress-wrap { margin-bottom: 18px; }
+.bank-level-line { display: flex; justify-content: space-between; font-size: 14px; margin-bottom: 8px; }
+.bank-bar-track { background: rgba(255,255,255,0.06); border-radius: 8px; height: 10px; overflow: hidden; }
+.bank-bar-fill { height: 100%; background: linear-gradient(90deg,#ffcf4d,#ff9f43); }
+.bank-percent { color: #7d829c; font-size: 12px; margin-top: 6px; text-align: right; }
+
+.deposit-row { display: flex; gap: 10px; margin-bottom: 10px; }
+.deposit-row input { flex: 1; }
+.deposit-meta { display: flex; justify-content: space-between; font-size: 12.5px; color: #7d829c; margin-bottom: 14px; }
+.preset-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 18px; }
+.preset-btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 9px; color: #cfd0e0; font-size: 12.5px; font-weight: bold; cursor: pointer; }
+.preset-btn:hover { background: rgba(255,255,255,0.1); }
+
+.level-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
+.level-tile { border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; padding: 10px 6px; text-align: center; font-size: 11.5px; color: #7d829c; }
+.level-tile.current-level { border-color: #ffcf4d; color: #ffcf4d; }
+
+
+.toggle-row { display: flex; gap: 10px; margin-bottom: 14px; }
+.toggle-btn {
+  flex: 1; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px;
+  padding: 11px; color: #cfd0e0; font-weight: bold; font-size: 13.5px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.toggle-btn.active-toggle { background: #2f6fed; border-color: #2f6fed; color: #fff; }
+.your-tokens-line { color: #7d829c; font-size: 12.5px; margin: 6px 0 14px 0; }
+
+
+.countdown-card { text-align: center; padding: 20px; margin-bottom: 16px; }
+.countdown-label { color: #7d829c; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; }
+.countdown-value { font-family: 'DynaPuff', Arial, sans-serif; font-size: 26px; color: #3b82f6; margin: 6px 0; }
+.cycle-sub { color: #565a75; font-size: 12px; }
+
+.leader-row {
+  display: flex; align-items: center; justify-content: space-between; padding: 12px 14px;
+  border-radius: 10px; margin-bottom: 8px; background: rgba(255,255,255,0.025); font-size: 13.5px;
+}
+.leader-row.mine { border: 1px solid #3b82f6; }
+.leader-left { display: flex; align-items: center; gap: 10px; }
+.rank-badge { font-weight: 800; width: 28px; text-align: center; }
+.rank-badge.top1 { color: #ffd93d; }
+.rank-badge.top2 { color: #cfd0e0; }
+.rank-badge.top3 { color: #d99a5c; }
+.leader-score { display: flex; align-items: center; gap: 5px; font-weight: bold; color: #ffcf4d; }
+
+
+.search-bar { margin-bottom: 16px; }
+.browse-row {
+  display: flex; align-items: center; justify-content: space-between; padding: 16px; border-radius: 12px;
+  border: 1px solid rgba(255,255,255,0.08); background: rgba(255,255,255,0.02); margin-bottom: 10px;
+}
+.browse-row.mine-row { border-color: #3b82f6; }
+.browse-left { display: flex; align-items: center; gap: 14px; }
+.browse-icon {
+  width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-family: 'DynaPuff', Arial, sans-serif; font-size: 18px; color: #fff; flex-shrink: 0; overflow: hidden;
+}
+.browse-name-line { font-weight: bold; font-size: 14.5px; display: flex; align-items: center; gap: 8px; }
+.browse-tag { color: #ff9f43; }
+.browse-meta { color: #7d829c; font-size: 12.5px; margin-top: 3px; }
+.browse-desc { color: #565a75; font-size: 12px; margin-top: 2px; }
+.join-btn { background: #2f6fed; border: none; border-radius: 8px; padding: 9px 16px; color: #fff; font-weight: bold; font-size: 12.5px; cursor: pointer; }
+.join-btn:hover { background: #3f7dfa; }
+.your-clan-pill { background: rgba(59,130,246,0.15); color: #3b82f6; padding: 7px 14px; border-radius: 8px; font-size: 12px; font-weight: bold; }
+.locked-pill { color: #7d829c; font-size: 12px; display: flex; align-items: center; gap: 5px; }
+
+.empty-note { color: #565a75; font-size: 13.5px; text-align: center; padding: 20px 0; }
+</style>
+
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=DynaPuff:wght@600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<style id="manglet-rehost-theme">
+:root {
+  --manglet-panel: #17191f;
+  --manglet-panel-2: #20232b;
+  --manglet-border: rgba(255,255,255,.09);
+  --manglet-text: #f4f5f7;
+  --manglet-muted: #9ba2b2;
+  --manglet-shadow: 0 14px 40px rgba(0,0,0,.22);
+  --manglet-radius: 18px;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html { min-height: 100%; scroll-behavior: smooth; }
+body {
+  background: var(--bg-color, #17100c) !important;
+  color: var(--manglet-text) !important;
+  font-family: 'Space Grotesk', Arial, sans-serif !important;
+  line-height: 1.5;
+}
+.sidebar {
+  width: 250px !important; background: var(--sidebar-color, #24160f) !important;
+  border-right: 1px solid rgba(255,255,255,.07);
+  padding: 22px 12px !important; box-shadow: 8px 0 30px rgba(0,0,0,.12);
+  overflow-y: auto; overflow-x: hidden;
+}
+.sidebar-logo {
+  font-family: 'DynaPuff','Space Grotesk',sans-serif !important;
+  font-size: 25px !important; letter-spacing: .5px !important;
+  color: #fff !important; padding: 0 12px 26px !important;
+}
+.sidebar-nav { gap: 5px; }
+.sidebar-nav a {
+  color: #c6cad4 !important; font: 600 13.5px 'Space Grotesk',sans-serif !important;
+  padding: 11px 13px !important; border-radius: 12px; margin: 0 2px;
+  gap: 11px !important; min-height: 42px; transition: background .18s, color .18s, transform .18s;
+}
+.sidebar-nav a:hover, .sidebar-nav a.active {
+  background: var(--sidebar-hover, #382216) !important; color: #fff !important;
+}
+.sidebar-nav a.active { box-shadow: inset 3px 0 0 var(--token-accent, #ff8c32); }
+.topbar { left: 250px !important; padding: 18px 24px !important; gap: 10px !important; }
+.token-display, .ruby-display {
+  border: 1px solid rgba(255,255,255,.12); border-radius: 13px !important;
+  padding: 8px 13px !important; box-shadow: 0 5px 16px rgba(0,0,0,.16);
+  font: 700 13px 'Space Grotesk',sans-serif !important;
+}
+.token-display { background: var(--token-accent, #ff8c32) !important; color: #fff !important; }
+.ruby-display { background: #a92d5b !important; color: #fff !important; }
+.main-content { margin-left: 250px !important; padding: 104px 28px 44px !important; min-width: 0; }
+.page-title, .owner-title, .profile-name, .section-title, .chat-panel-title, .picker-box h3, .title {
+  font-family: 'DynaPuff','Space Grotesk',sans-serif !important;
+  color: var(--manglet-text) !important; letter-spacing: -.3px;
+}
+.page-title { font-size: clamp(25px,3vw,34px) !important; }
+.page-subtitle, .owner-subtitle { color: var(--manglet-muted) !important; }
+.trade-wrap, .shop-wrap, .profile-wrap, .owner-wrap, .credits-wrap { max-width: 1240px; }
+.panel-card, .room-panel, .trade-list-card, .stat-card, .stat-tile, .shop-item-card,
+.shop-info-card, .collection-card, .clan-card, .profile-card, .card, .admin-row,
+.bazaar-card, .battle-card, .news-card, .leaderboard-card, .chat-panel,
+[class*="panel"], [class*="card"] {
+  border-color: var(--manglet-border);
+}
+.room-panel, .trade-list-card, .panel-card, .stat-card, .stat-tile, .shop-item-card,
+.shop-info-card, .collection-card, .clan-card, .profile-card, .card, .admin-row,
+.bazaar-card, .battle-card, .news-card, .leaderboard-card {
+  background: var(--manglet-panel) !important;
+  border-radius: var(--manglet-radius) !important;
+  box-shadow: var(--manglet-shadow);
+}
+input, textarea, select, .new-trade-row input, .chat-input-row input, .offer-tokens-row {
+  font-family: 'Space Grotesk',sans-serif !important;
+  border-radius: 12px !important;
+}
+input:not([type="checkbox"]):not([type="radio"]), textarea, select {
+  background-color: var(--manglet-panel-2) !important;
+  color: var(--manglet-text) !important; border-color: var(--manglet-border) !important;
+}
+button, .button, .btn, .shop-buy-btn, .add-blook-btn, .list-tab-btn, .friends-tab-btn,
+.profile-action-btn, .wide-btn {
+  font-family: 'Space Grotesk',sans-serif !important; font-weight: 700 !important;
+  border-radius: 12px !important; transition: transform .16s, filter .16s, background .16s;
+}
+button:hover:not(:disabled), .button:hover, .btn:hover { filter: brightness(1.08); }
+button:active:not(:disabled) { transform: translateY(1px); }
+.list-tab-btn, .friends-tab-btn {
+  background: var(--manglet-panel) !important; border: 1px solid var(--manglet-border) !important;
+  color: var(--manglet-muted) !important;
+}
+.list-tab-btn.active, .friends-tab-btn.active {
+  background: var(--token-accent) !important; border-color: var(--token-accent) !important; color: #fff !important;
+}
+.room-back-btn { color: var(--manglet-muted) !important; }
+.room-footer { border-radius: 14px !important; }
+.offer-blook-icon, .picker-tile-icon, .room-avatar, .trade-list-avatar { border-radius: 13px !important; }
+.picker-box { background: var(--manglet-panel) !important; border: 1px solid var(--manglet-border) !important; border-radius: 20px !important; }
+.page-header-row { gap: 14px; }
+a { transition: color .16s, background .16s; }
+@media (max-width: 900px) {
+  .sidebar { width: 76px !important; padding: 18px 7px !important; }
+  .sidebar-logo { font-size: 0 !important; padding: 0 0 24px !important; text-align: center; }
+  .sidebar-logo::after { content: 'M'; font: 700 27px 'DynaPuff',sans-serif; color: var(--token-accent,#ff8c32); }
+  .sidebar-nav a { justify-content: center; padding: 12px 5px !important; gap: 0 !important; font-size: 0 !important; min-height: 44px; }
+  .sidebar-nav a .manglet-nav-icon { font-size: 21px !important; }
+  .topbar { left: 76px !important; padding: 13px 14px !important; }
+  .main-content { margin-left: 76px !important; padding: 86px 16px 32px !important; }
+}
+@media (max-width: 560px) {
+  .main-content { padding: 84px 12px 24px !important; }
+  .topbar { gap: 6px !important; }
+  .token-display, .ruby-display { padding: 6px 8px !important; font-size: 11px !important; }
+  .token-display img, .ruby-display img { width: 18px !important; height: 18px !important; }
+  .room-panel, .panel-card { padding: 15px !important; }
+  .room-footer button { padding: 14px 8px !important; font-size: 12px !important; }
+}
+</style>
+
+
+<style id="manglet-unified-navigation">
+:root{--bg-color:#17100c;--sidebar-color:#24160f;--sidebar-hover:#382216;--token-accent:#ff8c32;--panel:#1d2027;--panel2:#252933;--border:rgba(255,255,255,.09);--text:#f5f6fa;--muted:#a1a7b5}
+*{box-sizing:border-box}
+html{min-height:100%;scroll-behavior:smooth}
+body{margin:0!important;min-height:100vh;background:var(--bg-color)!important;color:var(--text,#f5f6fa)!important;font-family:'Space Grotesk',sans-serif!important}
+.sidebar{position:fixed!important;inset:0 auto 0 0!important;width:250px!important;background:var(--sidebar-color)!important;padding:22px 12px!important;border-right:1px solid var(--border)!important;box-shadow:8px 0 30px #0002;overflow-y:auto;overflow-x:hidden;z-index:20}
+.sidebar-logo{font:700 25px 'DynaPuff',sans-serif!important;color:var(--text,#f5f6fa)!important;padding:0 12px 26px!important;letter-spacing:0!important}
+.sidebar-nav{display:flex!important;flex-direction:column!important;gap:5px!important;flex:1}
+.sidebar-nav a{display:flex!important;align-items:center!important;gap:10px!important;text-decoration:none!important;color:#c6cad4!important;padding:11px 13px!important;border-radius:12px!important;font:600 13.5px 'Space Grotesk',sans-serif!important;transition:background .18s,color .18s,transform .18s}
+.sidebar-nav a:hover,.sidebar-nav a.active{background:var(--sidebar-hover)!important;color:#fff!important}
+.sidebar-nav a.active{box-shadow:inset 3px 0 var(--token-accent)!important}
+.sidebar-nav .material-icons{font-size:20px!important;line-height:1;flex:0 0 20px}
+.topbar{position:fixed!important;top:0!important;left:250px!important;right:0!important;display:flex!important;justify-content:flex-end!important;align-items:center!important;padding:18px 24px!important;z-index:15!important;pointer-events:none}
+.token-display,.ruby-display{padding:8px 13px!important;border-radius:12px!important;background:var(--token-accent)!important;color:#fff!important;font-weight:700!important;margin-left:8px!important;box-shadow:0 6px 18px #0002}
+.ruby-display{background:#a92d5b!important}
+.token-display img,.ruby-display img{max-height:19px;max-width:19px;object-fit:contain;vertical-align:middle}
+.main-content{margin-left:250px!important;padding:100px 28px 44px!important;min-width:0}
+.page-title,.title,h1{font-family:'DynaPuff',sans-serif!important;color:var(--text,#f5f6fa)}
+.page-title,.title{font-size:clamp(27px,4vw,36px)!important;line-height:1.2;margin:8px 0 12px!important}
+.page-subtitle,.subtitle,.owner-subtitle{color:var(--muted,#a1a7b5)!important}
+.panel,.panel-card,.room-panel,.trade-list-card,.stat-card,.stat-tile,.shop-item-card,.shop-info-card,.credits-card,.settings-card,.content-card,.card{border-radius:18px!important;border:1px solid var(--border)!important;box-shadow:0 14px 40px #0003}
+button,.btn,input[type=button],input[type=submit]{border-radius:12px!important;font-family:'Space Grotesk',sans-serif!important}
+input,select,textarea{font-family:'Space Grotesk',sans-serif!important;border-radius:10px}
+a{transition:color .18s,background .18s}
+@media(max-width:900px){.sidebar{width:76px!important;padding:18px 7px!important}.sidebar-logo{font-size:0!important;text-align:center;padding:0 0 24px!important}.sidebar-logo:after{content:'M';font:700 27px 'DynaPuff',sans-serif;color:var(--token-accent)}.sidebar-nav a{justify-content:center!important;gap:0!important;font-size:0!important;padding:12px 5px!important}.sidebar-nav .material-icons{font-size:21px!important;flex:0 0 auto}.topbar{left:76px!important;padding:13px!important}.main-content{margin-left:76px!important;padding:86px 16px 32px!important}}
+@media(max-width:560px){.main-content{padding:84px 12px 24px!important}.panel,.panel-card,.room-panel,.trade-list-card,.stat-card,.stat-tile,.shop-item-card,.shop-info-card{padding:17px!important}.topbar{padding:10px!important}.token-display,.ruby-display{padding:7px 9px!important;font-size:12px}}
+</style>
+
+</head>
+<body>
+
+<div class="sidebar">
+<div class="sidebar-logo">Manglet Rehost</div>
+<nav class="sidebar-nav">
+<a href="dashboard"><span class="material-icons">storefront</span>Market</a>
+<a href="chat"><span class="material-icons">forum</span>Global Chat</a>
+<a href="collection"><span class="material-icons">inventory_2</span>Collection</a>
+<a href="clans" class="active"><span class="material-icons">groups</span>Clans</a>
+<a href="news"><span class="material-icons">newspaper</span>News</a>
+<a href="trade"><span class="material-icons">swap_horiz</span>Trade</a>
+<a href="bazaar"><span class="material-icons">store</span>Bazaar</a>
+<a href="battle"><span class="material-icons">sports_esports</span>Battle Royale</a>
+<a href="leaderboard"><span class="material-icons">leaderboard</span>Leaderboard</a>
+<a href="rubyshop"><span class="material-icons">diamond</span>Ruby Shop</a>
+<a href="credits"><span class="material-icons">favorite</span>Credits</a>
+<a href="settings"><span class="material-icons">settings</span>Settings</a>
+<a href="profile"><span class="material-icons">person</span>Profile</a>
+</nav>
+</div>
+
+<div class="topbar">
+<div class="token-display">
+<img src="coin.png" alt="coin" onerror="this.style.display='none'">
+<span id="tokenBalance">0</span>
+</div>
+<div class="ruby-display">
+<img src="ruby.png" alt="ruby" onerror="this.style.display='none'">
+<span id="rubyBalance">0</span>
+</div>
+</div>
+
+<div class="main-content">
+<div class="clans-wrap">
+
+  <div class="clans-header">
+    <div class="clans-title-block">
+      <span class="clans-title-icon">👥</span>
+      <div>
+        <div class="clans-title">Clans</div>
+        <div class="clans-subtitle">Create or join a clan!</div>
+      </div>
+    </div>
+    <button id="leaveBtn" class="leave-btn" style="display:none;" onclick="leaveClan()">↪ Leave</button>
+  </div>
+
+  <div id="tabRow" class="tab-row" style="display:none;">
+    <button class="tab-btn active" data-tab="overview" onclick="switchTab('overview')">Overview</button>
+    <button class="tab-btn" data-tab="members" onclick="switchTab('members')">Members</button>
+    <button class="tab-btn" data-tab="chat" onclick="switchTab('chat')">Chat</button>
+    <button class="tab-btn" data-tab="bank" onclick="switchTab('bank')">Bank</button>
+    <button class="tab-btn" data-tab="donate" onclick="switchTab('donate')">Donate</button>
+    <button class="tab-btn" data-tab="competition" onclick="switchTab('competition')">Competition</button>
+    <button class="tab-btn" data-tab="browse" onclick="switchTab('browse')">Browse</button>
+  </div>
+
+  
+  <div id="noClanState" style="display:none;">
+    <div class="no-clan-actions">
+      <div class="panel-card no-clan-card">
+        <h3>Create a Clan</h3>
+        <div class="panel-desc">A clan costs <span id="createCostLabel">1,000</span> tokens.</div>
+        <div class="field-gap">
+          <input type="text" id="createName" placeholder="Clan name...">
+          <input type="text" id="createTag" placeholder="Tag (e.g. AETH)...">
+          <textarea id="createDesc" placeholder="Short description (optional)..."></textarea>
+          <label class="checkbox-row"><input type="checkbox" id="createPublic" checked> Public (anyone can join)</label>
+        </div>
+        <button class="primary-btn" onclick="createClan()">Create Clan</button>
+      </div>
+      <div class="panel-card no-clan-card">
+        <h3>Browse Clans</h3>
+        <div class="panel-desc">Find a public clan to join or search by name.</div>
+        <button class="primary-btn" onclick="showBrowseStandalone()">Browse Clans</button>
+      </div>
+      <div class="panel-card no-clan-card">
+        <h3>Join with Invite Code</h3>
+        <div class="panel-desc">Got a code from a friend? Enter it here to join their invite-only clan.</div>
+        <div class="field-gap">
+          <input type="text" id="inviteCodeInput" placeholder="Invite code..." style="text-transform:uppercase;">
+        </div>
+        <button class="primary-btn" onclick="joinWithInviteCode()">Join Clan</button>
+      </div>
+    </div>
+    <div id="standaloneBrowse"></div>
+  </div>
+
+  
+  <div id="tab-overview" class="tab-panel"></div>
+  <div id="tab-members" class="tab-panel" style="display:none;"></div>
+  <div id="tab-chat" class="tab-panel" style="display:none;"></div>
+  <div id="tab-bank" class="tab-panel" style="display:none;"></div>
+  <div id="tab-donate" class="tab-panel" style="display:none;"></div>
+  <div id="tab-competition" class="tab-panel" style="display:none;"></div>
+  <div id="tab-browse" class="tab-panel" style="display:none;"></div>
+
+</div>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script>
+
+const AUTH_TOKEN = localStorage.getItem('mangletSessionToken');
+if (!AUTH_TOKEN) { location.href = "/login"; }
+
+function escapeHtml(str) {
+  const div = document.createElement('div');
+  div.textContent = str == null ? '' : String(str);
+  return div.innerHTML;
+}
+
+
+
+
+
+
+
+function escapeForJsAttr(str) {
+  return String(str == null ? '' : str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "\\'")
+    .replace(/"/g, '&quot;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+}
+
+async function apiFetch(url, options = {}) {
+  const opts = Object.assign({}, options);
+  opts.headers = Object.assign(
+    { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + AUTH_TOKEN },
+    options.headers || {}
+  );
+  const res = await fetch(url, opts);
+  if (res.status === 401) {
+    localStorage.removeItem('mangletSessionToken');
+    location.href = "/login";
+    throw new Error('Not logged in');
+  }
+  return res;
+}
+
+const socket = io({ auth: { token: AUTH_TOKEN } });
+const myUsername = localStorage.getItem('chatUsername') || '';
+socket.emit('registerUser', myUsername);
+socket.on('rubyEarned', (data) => {
+  const el = document.getElementById('rubyBalance');
+  if (el) el.innerText = fmt(data.rubies);
+});
+
+let me = null;
+let myClan = null;
+let currentTab = 'overview';
+
+function fmt(n) { return Math.round(n).toLocaleString('en-US'); }
+
+async function loadAll() {
+  const meRes = await apiFetch('/api/me');
+  const meData = await meRes.json();
+  me = meData.user;
+  document.getElementById('tokenBalance').innerText = fmt(me.tokens);
+  const rubyEl1 = document.getElementById('rubyBalance');
+  if (rubyEl1) rubyEl1.innerText = fmt(me.rubies || 0);
+  applyMangletTheme(me.theme);
+  showOwnerNav(me.isOwner);
+
+  const clanRes = await apiFetch('/api/clans/mine');
+  const clanData = await clanRes.json();
+  myClan = clanData.clan;
+
+  document.getElementById('leaveBtn').style.display = myClan ? 'flex' : 'none';
+  document.getElementById('tabRow').style.display = myClan ? 'flex' : 'none';
+  document.getElementById('noClanState').style.display = myClan ? 'none' : 'block';
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+
+  if (myClan) {
+    socket.emit('registerUser', myUsername); 
+    switchTab(currentTab); 
+  } else {
+    document.getElementById('createCostLabel').innerText = fmt(CLAN_CREATE_COST_CLIENT);
+  }
+}
+
+const CLAN_CREATE_COST_CLIENT = 1000; 
+
+function switchTab(tab) {
+  currentTab = tab;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+  document.querySelectorAll('.tab-panel').forEach(p => p.style.display = 'none');
+  document.getElementById('tab-' + tab).style.display = 'block';
+  renderTab(tab);
+}
+
+function renderTab(tab) {
+  if (tab === 'overview') renderOverview();
+  else if (tab === 'members') renderMembers();
+  else if (tab === 'chat') renderChatTab();
+  else if (tab === 'bank') renderBank();
+  else if (tab === 'donate') renderDonate();
+  else if (tab === 'competition') renderCompetition();
+  else if (tab === 'browse') renderBrowse('tab-browse');
+}
+
+
+async function renderOverview() {
+  const el = document.getElementById('tab-overview');
+  const colorsRes = await apiFetch('/api/clans/colors');
+  const colorsData = await colorsRes.json();
+  const colors = colorsData.colors;
+  const isOwner = myClan.ownerUsername.toLowerCase() === myUsername.toLowerCase();
+
+  const iconInnerHtml = myClan.iconImage
+    ? `<img src="${escapeHtml(myClan.iconImage)}" alt="${escapeHtml(myClan.name)}" style="width:100%; height:100%; object-fit:cover; border-radius:14px;" onerror="this.remove(); this.parentElement.innerText='${escapeHtml(myClan.icon)}';">`
+    : escapeHtml(myClan.icon);
+
+  el.innerHTML = `
+    <div class="panel-card clan-id-card">
+      <div class="clan-icon-box" style="background:${colorHexOrGradient(colors[myClan.activeColor])};">${iconInnerHtml}</div>
+      <div>
+        <div class="clan-name-line" style="color:${colorTextColor(colors[myClan.activeColor])};">[${escapeHtml(myClan.name)}]</div>
+        <div class="clan-meta-line">${myClan.memberCount} members • ${myClan.public ? 'Public' : 'Invite Only'}</div>
+      </div>
+    </div>
+
+    ${isOwner ? `
+    <div class="panel-card">
+      <h3>🖼️ Clan Icon</h3>
+      <div class="panel-desc">Upload a PNG, JPG, GIF, or WebP (max 512 KB) to use as your clan's icon. Reset to go back to the default letter.</div>
+      <div class="field-gap" style="margin-bottom:0;">
+        <input type="file" id="iconInput" accept="image/png,image/jpeg,image/gif,image/webp">
+        <div style="display:flex; gap:10px;">
+          <button class="primary-btn" onclick="saveClanIcon()">Upload Icon</button>
+          <button class="wide-btn btn-soft-red" style="width:auto; padding:12px 18px; flex-shrink:0;" onclick="resetClanIcon()">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-card">
+      <h3>🔒 Clan Visibility</h3>
+      <div class="panel-desc">${myClan.public ? 'Anyone can find and join your clan from Browse.' : 'Only people with your invite code can join.'}</div>
+      <div class="toggle-row">
+        <button class="toggle-btn ${myClan.public ? 'active-toggle' : ''}" onclick="setVisibility(true)">🌐 Public</button>
+        <button class="toggle-btn ${!myClan.public ? 'active-toggle' : ''}" onclick="setVisibility(false)">🔒 Invite Only</button>
+      </div>
+    </div>
+    ` : ''}
+
+    ${(!myClan.public && myClan.inviteCode) ? `
+    <div class="panel-card">
+      <h3>🎟️ Invite Code</h3>
+      <div class="panel-desc">Share this code so people can join your invite-only clan.</div>
+      <div style="display:flex; gap:10px; align-items:center;">
+        <div style="flex:1; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; padding:12px 14px; font-weight:800; font-size:16px; letter-spacing:2px; color:#ffcf4d;">${myClan.inviteCode}</div>
+        <button class="primary-btn" style="width:auto; padding:12px 18px;" onclick="copyInviteCode()">Copy</button>
+        ${isOwner ? `<button class="wide-btn btn-soft-red" style="width:auto; padding:12px 18px;" onclick="regenerateInviteCode()">Regenerate</button>` : ''}
+      </div>
+    </div>
+    ` : ''}
+
+    <div class="panel-card">
+      <h3>🎨 Clan Name Colors</h3>
+      <div class="panel-desc">Costs paid from your personal tokens (owner only). Once bought, switch for free!</div>
+      <div class="color-grid" id="colorGrid"></div>
+    </div>
+  `;
+
+  const grid = document.getElementById('colorGrid');
+  grid.innerHTML = Object.entries(colors).map(([key, c]) => {
+    const owned = myClan.colorsOwned.includes(key);
+    const active = myClan.activeColor === key;
+    let pillHtml;
+    if (active) pillHtml = `<span class="pill active-pill">ACTIVE</span>`;
+    else if (owned) pillHtml = `<span class="pill owned">OWNED</span>`;
+    else pillHtml = `<span class="pill buy">${fmt(c.cost)} 🪙</span>`;
+
+    return `
+      <div class="color-tile ${active ? 'active-tile' : ''}" onclick="handleColorClick('${key}', ${owned}, ${isOwner})">
+        <div>
+          <div class="color-name" style="color:${colorTextColor(c)};">${c.label}</div>
+          <div class="color-sub">${owned ? 'Free to switch' : (isOwner ? 'Tap to buy' : 'Owner only')}</div>
+        </div>
+        ${pillHtml}
+      </div>
+    `;
+  }).join('');
+}
+
+function colorHexOrGradient(c) {
+  if (!c) return '#333';
+  return c.hex;
+}
+function colorTextColor(c) {
+  if (!c) return '#fff';
+  return c.hex.startsWith('linear') ? '#ff6bcb' : c.hex;
+}
+
+
+const MAX_IMAGE_BYTES = 512 * 1024;
+async function uploadImage(url, file) {
+  if (!file) return null;
+  if (!['image/png', 'image/jpeg', 'image/gif', 'image/webp'].includes(file.type)) {
+    alert('Pick a PNG, JPG, GIF, or WebP image.');
+    return null;
+  }
+  if (file.size > MAX_IMAGE_BYTES) { alert('Images must be 512 KB or smaller.'); return null; }
+  const res = await apiFetch(url, { method: 'POST', headers: { 'Content-Type': file.type }, body: file });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return null; }
+  return data;
+}
+
+async function saveClanIcon() {
+  const file = document.getElementById('iconInput').files[0];
+  if (!file) { alert('Choose an image first.'); return; }
+  const data = await uploadImage('/api/clans/icon/upload', file);
+  if (!data) return;
+  myClan = data.clan;
+  renderOverview();
+}
+async function resetClanIcon() {
+  const res = await apiFetch('/api/clans/icon', { method: 'POST', body: JSON.stringify({ image: '' }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  myClan = data.clan;
+  renderOverview();
+}
+async function setVisibility(isPublic) {
+  if (isPublic === myClan.public) return;
+  const res = await apiFetch('/api/clans/visibility', { method: 'POST', body: JSON.stringify({ isPublic }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  myClan = data.clan;
+  renderOverview();
+}
+async function regenerateInviteCode() {
+  if (!confirm('Regenerate the invite code? The old code will stop working.')) return;
+  const res = await apiFetch('/api/clans/invite/regenerate', { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  myClan = data.clan;
+  renderOverview();
+}
+function copyInviteCode() {
+  if (!myClan.inviteCode) return;
+  navigator.clipboard.writeText(myClan.inviteCode).then(() => {
+    alert('Invite code copied!');
+  }).catch(() => {
+    alert('Invite code: ' + myClan.inviteCode);
+  });
+}
+
+async function handleColorClick(key, owned, isOwner) {
+  if (!isOwner) { alert('Only the clan owner can buy or switch colors.'); return; }
+  if (owned) {
+    const res = await apiFetch('/api/clans/colors/switch', { method: 'POST', body: JSON.stringify({ color: key }) });
+    const data = await res.json();
+    if (!res.ok) { alert(data.message); return; }
+    myClan = data.clan;
+    renderOverview();
+  } else {
+    const res = await apiFetch('/api/clans/colors/buy', { method: 'POST', body: JSON.stringify({ color: key }) });
+    const data = await res.json();
+    if (!res.ok) { alert(data.message); return; }
+    me.tokens = data.tokens;
+    myClan = data.clan;
+    document.getElementById('tokenBalance').innerText = fmt(me.tokens);
+    renderOverview();
+  }
+}
+
+
+function renderMembers() {
+  const el = document.getElementById('tab-members');
+  const mine = myClan.members.find(m => m.username.toLowerCase() === myUsername.toLowerCase());
+  const myRoleActual = mine ? mine.role : 'member';
+  const canManage = myRoleActual === 'owner' || myRoleActual === 'admin';
+
+  el.innerHTML = `
+    <div class="panel-card">
+      <h3>Members (${myClan.memberCount})</h3>
+      <div id="memberList"></div>
+    </div>
+  `;
+
+  const list = document.getElementById('memberList');
+  list.innerHTML = myClan.members.map(m => {
+    const isSelf = m.username.toLowerCase() === myUsername.toLowerCase();
+    let actions = '';
+    if (canManage && !isSelf && m.role !== 'owner') {
+      const canKick = myRoleActual === 'owner' || m.role === 'member';
+      const roleButtons = myRoleActual === 'owner'
+        ? (m.role === 'admin'
+            ? `<button onclick="setRole('${escapeForJsAttr(m.username)}','member')">Demote</button>`
+            : `<button onclick="setRole('${escapeForJsAttr(m.username)}','admin')">Promote</button>`)
+        : '';
+      actions = `<div class="member-actions">${roleButtons}${canKick ? `<button class="kick" onclick="kickMember('${escapeForJsAttr(m.username)}')">Kick</button>` : ''}</div>`;
+    }
+    return `
+      <div class="member-row">
+        <div class="member-left">
+          <span>${escapeHtml(m.username)}</span>
+          <span class="role-tag">${m.role.charAt(0).toUpperCase() + m.role.slice(1)}</span>
+        </div>
+        ${actions}
+      </div>
+    `;
+  }).join('');
+}
+
+async function setRole(username, role) {
+  const res = await apiFetch('/api/clans/members/role', { method: 'POST', body: JSON.stringify({ username, role }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  myClan = data.clan;
+  renderMembers();
+}
+async function kickMember(username) {
+  if (!confirm(`Kick ${username} from the clan?`)) return;
+  const res = await apiFetch('/api/clans/members/kick', { method: 'POST', body: JSON.stringify({ username }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  myClan = data.clan;
+  renderMembers();
+}
+
+
+let clanChatBound = false;
+async function renderChatTab() {
+  const el = document.getElementById('tab-chat');
+  el.innerHTML = `
+    <div class="panel-card">
+      <div id="clanChatBox" class="clan-chat-box"></div>
+      <div class="clan-chat-form">
+        <input type="text" id="clanChatInput" placeholder="Clan chat..." onkeydown="if(event.key==='Enter') sendClanChat()">
+        <button class="clan-send-btn" onclick="sendClanChat()">➤</button>
+      </div>
+    </div>
+  `;
+
+  const res = await apiFetch('/api/clans/chat');
+  const data = await res.json();
+  const box = document.getElementById('clanChatBox');
+  box.innerHTML = data.messages.map(renderClanMsgHtml).join('');
+  box.scrollTop = box.scrollHeight;
+
+  if (!clanChatBound) {
+    clanChatBound = true;
+    socket.on('clanMessage', (msg) => {
+      if (currentTab !== 'chat') return;
+      const box = document.getElementById('clanChatBox');
+      if (!box) return;
+      box.insertAdjacentHTML('beforeend', renderClanMsgHtml(msg));
+      box.scrollTop = box.scrollHeight;
+    });
+  }
+}
+function renderClanMsgHtml(msg) {
+  const initial = escapeHtml(msg.author.charAt(0).toUpperCase());
+  const time = new Date(msg.timestamp).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  return `
+    <div class="clan-chat-msg">
+      <div class="clan-chat-avatar">${initial}</div>
+      <div>
+        <div class="clan-chat-meta"><span class="clan-chat-author">${escapeHtml(msg.author)}</span><span class="clan-chat-time">${time}</span></div>
+        <div class="clan-chat-text">${escapeHtml(msg.text)}</div>
+      </div>
+    </div>
+  `;
+}
+function sendClanChat() {
+  const input = document.getElementById('clanChatInput');
+  const text = input.value.trim();
+  if (!text) return;
+  socket.emit('clanChatMessage', { text });
+  input.value = '';
+}
+
+
+const CLAN_BANK_LEVELS_CLIENT = [5000, 100000, 1000000, 10000000, 500000000];
+function renderBank() {
+  const el = document.getElementById('tab-bank');
+  const cap = CLAN_BANK_LEVELS_CLIENT[myClan.bank.level - 1];
+  const pct = myClan.bank.maxed ? 100 : Math.min(100, (myClan.bank.tokens / cap) * 100);
+
+  el.innerHTML = `
+    <div class="panel-card">
+      <h3>🐷 Clan Bank</h3>
+      <div class="panel-desc">Anyone can deposit tokens. When the bank fills up, everyone gets their deposit back — <b>doubled</b> if at least ${myClan.bank.bonusMinContributors} different players each put in 10% or more of the level. ${myClan.bank.contributors} player${myClan.bank.contributors === 1 ? ' has' : 's have'} deposited this level.</div>
+
+      <div class="bank-progress-wrap">
+        <div class="bank-level-line">
+          <span>Bank Level ${myClan.bank.level}${myClan.bank.maxed ? ' — MAXED' : ''}</span>
+          <span>🪙 ${fmt(myClan.bank.tokens)} / ${fmt(cap)}</span>
+        </div>
+        <div class="bank-bar-track"><div class="bank-bar-fill" style="width:${pct}%;"></div></div>
+        <div class="bank-percent">${pct.toFixed(1)}% full</div>
+      </div>
+
+      <div style="font-size:11px; color:#7d829c; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase;">Deposit Tokens</div>
+      <div class="deposit-row">
+        <input type="number" id="depositAmount" placeholder="Amount...">
+        <button class="primary-btn" style="width:auto; padding:12px 24px;" onclick="depositBank()">Deposit</button>
+      </div>
+      <div class="deposit-meta">
+        <span>Your tokens: 🪙 ${fmt(me.tokens)}</span>
+        <span id="hourlyLeftLabel">Hourly limit: 🪙 1,000,000 left</span>
+      </div>
+
+      <div class="preset-row">
+        <button class="preset-btn" onclick="setDeposit(1000)">1,000</button>
+        <button class="preset-btn" onclick="setDeposit(10000)">10,000</button>
+        <button class="preset-btn" onclick="setDeposit(100000)">100,000</button>
+        <button class="preset-btn" onclick="setDeposit('max')">Max</button>
+      </div>
+
+      <div style="font-size:11px; color:#7d829c; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase;">All Bank Levels</div>
+      <div class="level-grid">
+        ${CLAN_BANK_LEVELS_CLIENT.map((cap, i) => `
+          <div class="level-tile ${myClan.bank.level === i + 1 ? 'current-level' : ''}">
+            Lv ${i + 1}<br>🪙 ${abbrev(cap)}
+          </div>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+function abbrev(n) {
+  if (n >= 1000000) return (n / 1000000) + 'M';
+  if (n >= 1000) return (n / 1000) + 'k';
+  return n;
+}
+function setDeposit(val) {
+  document.getElementById('depositAmount').value = val === 'max' ? me.tokens : val;
+}
+async function depositBank() {
+  const amount = parseInt(document.getElementById('depositAmount').value, 10);
+  if (!amount || amount <= 0) { alert('Enter a valid amount.'); return; }
+
+  const res = await apiFetch('/api/clans/bank/deposit', { method: 'POST', body: JSON.stringify({ amount }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+
+  me.tokens = data.tokens;
+  myClan.bank = data.bank;
+  document.getElementById('tokenBalance').innerText = fmt(me.tokens);
+  if (data.deposited < amount) alert(`Only ${fmt(data.deposited)} was needed to fill this level, so that's all that was deposited.`);
+  if (data.filled) {
+    alert(data.doubled
+      ? '🎉 The clan bank filled up! Everyone who deposited got their tokens back doubled.'
+      : `The clan bank filled up and everyone got their deposit back. Get at least ${myClan.bank.bonusMinContributors} different players to chip in 10%+ next time to double it!`);
+  }
+  renderBank();
+}
+
+
+let donateType = 'tokens';
+const PACK_CONFIGS_CLIENT = {
+  spacePack: { label: "Space Pack", rates: [
+    { name: "Earth" }, { name: "Meteor" }, { name: "Stars" }, { name: "Alien" }, { name: "Planet" }, { name: "Spaceship" },
+    { name: "UFO" }, { name: "Astronaut" }, { name: "Space Terminal" }, { name: "Space Debugger" },
+    { name: "Pink Astronaut" }, { name: "Red Astronaut" }, { name: "Orange Astronaut" }, { name: "Yellow Astronaut" },
+    { name: "Lime Astronaut" }, { name: "Green Astronaut" }, { name: "Cyan Astronaut" }, { name: "Blue Astronaut" },
+    { name: "Purple Astronaut" }, { name: "Brown Astronaut" }, { name: "Black Astronaut" },
+    { name: "Tim the Alien" }, { name: "Rainbow Astronaut" }
+  ] },
+  medievalPack: { label: "Medieval Pack", rates: [
+    { name: "Elf" }, { name: "Fairy" }, { name: "Slime Monster" }, { name: "Witch" }, { name: "Wizard" },
+    { name: "Dragon" }, { name: "Jester" }, { name: "Queen" }, { name: "Unicorn" }, { name: "King" }, { name: "Phantom King" }
+  ] },
+  blizzardPack: { label: "Blizzard Pack", rates: [ { name: "Snowman" }, { name: "Penguin" }, { name: "Frost Giant" } ] },
+  cyberPack: { label: "Bot Pack", rates: [
+    { name: "Angry Bot" }, { name: "Happy Bot" }, { name: "Lil Bot" }, { name: "Lovely Bot" },
+    { name: "Buddy Bot" }, { name: "Watson" }, { name: "Brainy Bot" }, { name: "Mega Bot" }
+  ] },
+  breakfastpack: { label: "Breakfast Pack", rates: [
+    { name: "Toast" }, { name: "Cereal" }, { name: "Yogurt" }, { name: "Breakfast Combo" }, { name: "Orange Juice" },
+    { name: "Milk" }, { name: "Waffle" }, { name: "Pancakes" }, { name: "French Toast" }, { name: "Pizza" },
+    { name: "Chocolate Milk" }, { name: "Bacon and Eggs" }, { name: "Rainbow Waffles" }
+  ] },
+  outbackpack:   { label: "Outback Pack",   rates: [
+    { name: "Dingo" }, { name: "Echidna" }, { name: "Koala" }, { name: "Kookaburra" }, { name: "Platypus" },
+    { name: "Joey" }, { name: "Kangaroo" }, { name: "Crocodile" }, { name: "Sugar Glider" }, { name: "Teal Platypus" }
+  ] },
+  safariPack: { label: "Safari Pack", rates: [
+    { name: "Panda" }, { name: "Sloth" }, { name: "Tenrec" }, { name: "Flamingo" }, { name: "Zebra" },
+    { name: "Elephant" }, { name: "Lemur" }, { name: "Peacock" }, { name: "Chameleon" }, { name: "Lion" }, { name: "Rainbow Panda" }
+  ] },
+  bugPack: { label: "Bug Pack", rates: [
+    { name: "Ant" }, { name: "Rhino Beetle" }, { name: "Ladybug" }, { name: "Fly" },
+    { name: "Worm" }, { name: "Bee" }, { name: "Mantis" }, { name: "Butterfly" }, { name: "Blue Butterfly" }
+  ] },
+  iceMonstersPack: { label: "Ice Monsters Pack", rates: [
+    { name: "Ice Bat" }, { name: "Ice Bug" }, { name: "Ice Elemental" }, { name: "Rock Monster" },
+    { name: "Dink" }, { name: "Donk" }, { name: "Bush Monsters" }, { name: "Yeti" },
+    { name: "Ice Slime" }, { name: "Frozen Fossil" }, { name: "Ice Crab" }
+  ] },
+  aquaticPack: { label: "Aquatic Pack", rates: [
+    { name: "Old Boot" }, { name: "Clownfish" }, { name: "Crab" }, { name: "Frog" }, { name: "Jellyfish" },
+    { name: "Blobfish" }, { name: "Octopus" }, { name: "Pufferfish" }, { name: "Narwal" }, { name: "Dolphin" },
+    { name: "Baby Shark" }, { name: "Megalodon" }, { name: "Golden Blobfish" }
+  ] }
+};
+function renderDonate() {
+  const el = document.getElementById('tab-donate');
+  const others = myClan.members.filter(m => m.username.toLowerCase() !== myUsername.toLowerCase());
+
+  el.innerHTML = `
+    <div class="panel-card">
+      <h3>🎁 Donate to Clan Member</h3>
+      <div style="font-size:11px; color:#7d829c; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase;">Member</div>
+      <div class="field-gap" style="margin-bottom:14px;">
+        <select id="donateMember">
+          <option value="">Select member...</option>
+          ${others.map(m => `<option value="${escapeHtml(m.username)}">${escapeHtml(m.username)}</option>`).join('')}
+        </select>
+      </div>
+
+      <div class="toggle-row">
+        <button class="toggle-btn ${donateType === 'tokens' ? 'active-toggle' : ''}" onclick="setDonateType('tokens')">🪙 Tokens</button>
+        <button class="toggle-btn ${donateType === 'blook' ? 'active-toggle' : ''}" onclick="setDonateType('blook')">🎁 Blook</button>
+      </div>
+
+      <div id="donateFields"></div>
+      <button class="primary-btn" onclick="submitDonate()">Donate ${donateType === 'tokens' ? 'Tokens' : 'Blook'}</button>
+    </div>
+  `;
+  renderDonateFields();
+}
+function setDonateType(type) {
+  donateType = type;
+  renderDonate();
+}
+function renderDonateFields() {
+  const wrap = document.getElementById('donateFields');
+  if (donateType === 'tokens') {
+    wrap.innerHTML = `
+      <div style="font-size:11px; color:#7d829c; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase;">Amount</div>
+      <input type="number" id="donateAmount" placeholder="Tokens to donate..." style="margin-bottom:8px;">
+      <div class="your-tokens-line">Your tokens: 🪙 ${fmt(me.tokens)}</div>
+    `;
+  } else {
+    const options = [];
+    Object.entries(PACK_CONFIGS_CLIENT).forEach(([packKey, cfg]) => {
+      cfg.rates.forEach(b => {
+        const owned = (me.collection[packKey + '::' + b.name] || 0);
+        if (owned > 0) options.push(`<option value="${packKey}::${b.name}">${b.name} (${cfg.label}) — you have ${owned}</option>`);
+      });
+    });
+    wrap.innerHTML = `
+      <div style="font-size:11px; color:#7d829c; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase;">Blook</div>
+      <select id="donateBlook" style="margin-bottom:8px;">
+        <option value="">Select a blook you own...</option>
+        ${options.join('') || '<option disabled>You have no blooks to donate</option>'}
+      </select>
+      <div style="font-size:11px; color:#7d829c; letter-spacing:1px; margin-bottom:8px; text-transform:uppercase;">Quantity</div>
+      <input type="number" id="donateQty" value="1" min="1" style="margin-bottom:8px;">
+    `;
+  }
+}
+async function submitDonate() {
+  const toUsername = document.getElementById('donateMember').value;
+  if (!toUsername) { alert('Pick a member to donate to.'); return; }
+
+  let body;
+  if (donateType === 'tokens') {
+    const amount = parseInt(document.getElementById('donateAmount').value, 10);
+    if (!amount || amount <= 0) { alert('Enter a valid amount.'); return; }
+    body = { toUsername, type: 'tokens', amount };
+  } else {
+    const val = document.getElementById('donateBlook').value;
+    if (!val) { alert('Pick a blook to donate.'); return; }
+    const [packKey, name] = val.split('::');
+    const qty = parseInt(document.getElementById('donateQty').value, 10) || 1;
+    body = { toUsername, type: 'blook', packKey, name, amount: qty };
+  }
+
+  const res = await apiFetch('/api/clans/donate', { method: 'POST', body: JSON.stringify(body) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+
+  me.tokens = data.tokens;
+  me.collection = data.collection;
+  document.getElementById('tokenBalance').innerText = fmt(me.tokens);
+  renderDonate();
+  alert('Donated!');
+}
+
+
+let countdownInterval = null;
+async function renderCompetition() {
+  const el = document.getElementById('tab-competition');
+  const res = await apiFetch('/api/clans/competition');
+  const data = await res.json();
+
+  el.innerHTML = `
+    <div class="panel-card countdown-card">
+      <div class="countdown-label">Next Winner Declared In</div>
+      <div class="countdown-value" id="countdownValue">--</div>
+      <div class="cycle-sub">Cycle #${data.cycleNumber} • Resets every 2 weeks</div>
+    </div>
+
+    <div class="panel-card">
+      <h3>🏆 Clan Pack Competition</h3>
+      <div class="panel-desc">Top clan wins ${fmt(data.clanRewardPerMember)} tokens per member! Top individual wins ${fmt(data.individualReward)} tokens!</div>
+      <div id="clanBoard"></div>
+    </div>
+  `;
+
+  const board = document.getElementById('clanBoard');
+  if (data.clanBoard.length === 0) {
+    board.innerHTML = '<div class="empty-note">No clan activity yet this cycle.</div>';
+  } else {
+    board.innerHTML = data.clanBoard.map((entry, i) => {
+      const rank = i + 1;
+      const isMine = myClan && entry.clan.id === myClan.id;
+      const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : '#' + rank;
+      const rankClass = rank === 1 ? 'top1' : rank === 2 ? 'top2' : rank === 3 ? 'top3' : '';
+      return `
+        <div class="leader-row ${isMine ? 'mine' : ''}">
+          <div class="leader-left">
+            <span class="rank-badge ${rankClass}">${medal}</span>
+            <span>[${escapeHtml(entry.clan.name)}]</span>
+            <span style="color:#7d829c; font-size:12px;">${entry.clan.memberCount} members</span>
+          </div>
+          <div class="leader-score">📦 ${fmt(entry.score)}</div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  if (countdownInterval) clearInterval(countdownInterval);
+  function tick() {
+    const remaining = data.cycleEndsAt - Date.now();
+    const el2 = document.getElementById('countdownValue');
+    if (!el2) { clearInterval(countdownInterval); return; }
+    if (remaining <= 0) { el2.innerText = 'Any moment now...'; return; }
+    const d = Math.floor(remaining / 86400000);
+    const h = Math.floor((remaining % 86400000) / 3600000);
+    const m = Math.floor((remaining % 3600000) / 60000);
+    el2.innerText = `${d}d ${h}h ${m}m`;
+  }
+  tick();
+  countdownInterval = setInterval(tick, 30000);
+}
+
+
+async function renderBrowse(targetId, query) {
+  const el = document.getElementById(targetId);
+  el.innerHTML = `
+    <div class="panel-card">
+      <input type="text" class="search-bar" id="browseSearch-${targetId}" placeholder="Search clans..." value="${query || ''}" oninput="debouncedBrowseSearch('${targetId}')">
+      <div id="browseList-${targetId}"></div>
+    </div>
+  `;
+  await runBrowseSearch(targetId, query || '');
+}
+let browseDebounce = null;
+function debouncedBrowseSearch(targetId) {
+  clearTimeout(browseDebounce);
+  browseDebounce = setTimeout(() => {
+    const q = document.getElementById(`browseSearch-${targetId}`).value;
+    runBrowseSearch(targetId, q);
+  }, 250);
+}
+async function runBrowseSearch(targetId, query) {
+  const res = await apiFetch('/api/clans?q=' + encodeURIComponent(query));
+  const data = await res.json();
+  const list = document.getElementById(`browseList-${targetId}`);
+
+  if (data.clans.length === 0) {
+    list.innerHTML = '<div class="empty-note">No clans found.</div>';
+    return;
+  }
+
+  list.innerHTML = data.clans.map(c => {
+    const isMine = myClan && c.id === myClan.id;
+    let rightHtml;
+    if (isMine) rightHtml = `<span class="your-clan-pill">Your Clan</span>`;
+    else if (c.public) rightHtml = `<button class="join-btn" onclick="joinClan('${c.id}')">Join</button>`;
+    else rightHtml = `<span class="locked-pill">🔒 Invite Only</span>`;
+
+    const iconInner = c.iconImage
+      ? `<img src="${escapeHtml(c.iconImage)}" style="width:100%; height:100%; object-fit:cover;" onerror="this.remove(); this.parentElement.innerText='${escapeForJsAttr(c.icon)}';">`
+      : escapeHtml(c.icon);
+
+    return `
+      <div class="browse-row ${isMine ? 'mine-row' : ''}">
+        <div class="browse-left">
+          <div class="browse-icon" style="background:#3b82f6;">${iconInner}</div>
+          <div>
+            <div class="browse-name-line">
+              <span class="browse-tag">[${escapeHtml(c.name)}]</span>
+              <span style="color:#7d829c; font-size:12px;">${c.memberCount} members</span>
+              <span style="color:#7d829c; font-size:12px;">${c.public ? '🌐 Public' : '🔒 Invite Only'}</span>
+            </div>
+            <div class="browse-desc">${escapeHtml(c.description || '')}</div>
+          </div>
+        </div>
+        ${rightHtml}
+      </div>
+    `;
+  }).join('');
+}
+function showBrowseStandalone() {
+  renderBrowse('standaloneBrowse');
+}
+async function joinClan(clanId) {
+  const res = await apiFetch('/api/clans/join', { method: 'POST', body: JSON.stringify({ clanId }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  await loadAll();
+}
+async function joinWithInviteCode() {
+  const input = document.getElementById('inviteCodeInput');
+  const code = input.value.trim();
+  if (!code) { alert('Enter an invite code.'); return; }
+
+  const res = await apiFetch('/api/clans/join', { method: 'POST', body: JSON.stringify({ inviteCode: code }) });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  await loadAll();
+}
+
+
+async function createClan() {
+  const name = document.getElementById('createName').value.trim();
+  const tag = document.getElementById('createTag').value.trim();
+  const description = document.getElementById('createDesc').value.trim();
+  const isPublic = document.getElementById('createPublic').checked;
+
+  if (!name || !tag) { alert('Give your clan a name and a tag.'); return; }
+
+  const res = await apiFetch('/api/clans/create', {
+    method: 'POST',
+    body: JSON.stringify({ name, tag, description, isPublic })
+  });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  await loadAll();
+}
+async function leaveClan() {
+  if (!confirm('Leave your clan?')) return;
+  const res = await apiFetch('/api/clans/leave', { method: 'POST' });
+  const data = await res.json();
+  if (!res.ok) { alert(data.message); return; }
+  currentTab = 'overview';
+  await loadAll();
+}
+
+loadAll();
+</script>
+
+
+<script id="manglet-rehost-nav-icons">
+(() => {
+  const iconMap = {
+    'Market':'storefront','Shop':'shopping-bag','Global Chat':'forum','Collection':'inventory_2',
+    'Clans':'groups','News':'newspaper','Trade':'swap_horiz','Bazaar':'store',
+    'Battle Royale':'sports_esports','Leaderboard':'leaderboard','Ruby Shop':'diamond',
+    'Credits':'favorite','Settings':'settings','Profile':'person','Admin Panel':'admin_panel_settings',
+    'Owner Panel':'verified_user'
+  };
+  document.querySelectorAll('.sidebar-nav a').forEach(a => {
+    const label = a.textContent.trim();
+    const icon = iconMap[label];
+    if (icon && !a.querySelector('.manglet-nav-icon')) {
+      const span = document.createElement('span');
+      span.className = 'material-icons manglet-nav-icon';
+      span.setAttribute('aria-hidden','true');
+      span.textContent = icon;
+      span.style.fontSize = '19px';
+      span.style.lineHeight = '1';
+      a.prepend(span);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
