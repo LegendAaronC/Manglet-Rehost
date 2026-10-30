@@ -1,2 +1,2 @@
-# Manglet
-real manglet, now, no AI
+# Manglet Rehost
+This Manglet is Rehosted by Aaron.
